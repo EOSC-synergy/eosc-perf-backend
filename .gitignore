@@ -56,3 +56,6 @@ env/
 AUTHORS
 ChangeLog
 dist/
+
+# IDE settings
+.vscode/
