@@ -50,12 +50,10 @@ docs/_build
 .webassets-cache
 
 # Virtualenvs
+.env
 env/
 
 # .whl side effects
 AUTHORS
 ChangeLog
 dist/
-
-# IDE settings
-.vscode/
