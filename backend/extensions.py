@@ -8,7 +8,6 @@ Each extension requires of a specific class initialization which is
 lately initialized in the application factory using the settings and
 configurations from the environment.
 """
-from flask_bcrypt import Bcrypt
 from flask_mailman import Mail
 from flask_migrate import Migrate
 from flask_smorest import Api
@@ -18,9 +17,6 @@ from .authorization import Authorization
 
 #: Flask extension that provides support for handling oidc Access Tokens
 auth = Authorization()
-
-#: Flask extension that provides bcrypt hashing utilities
-bcrypt = Bcrypt()
 
 #: Flask framework library for creating REST APIs (i.e. OpenAPI)
 api = Api()

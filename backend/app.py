@@ -11,7 +11,6 @@ from webargs.flaskparser import FlaskParser
 from . import routes
 from .extensions import api         # Api interface module
 from .extensions import auth        # flaat ext. manage db migrations
-from .extensions import bcrypt      # Encrypt passwords and others
 from .extensions import db          # SQLAlchemy instance
 from .extensions import migrate     # Alembic ext. manage db migrations
 from .extensions import mail        # Mail ext. to send notifications
@@ -83,7 +82,6 @@ def create_app(config_base="backend.settings", **settings_override):
 def register_extensions(app):
     """Register Flask extensions."""
     api.init_app(app)
-    bcrypt.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)
     auth.init_app(app)
