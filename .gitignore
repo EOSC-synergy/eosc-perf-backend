@@ -46,7 +46,6 @@ output/*/index.html
 
 # Sphinx
 docs/_build
-
 .webassets-cache
 
 # Virtualenvs
@@ -57,3 +56,6 @@ env/
 AUTHORS
 ChangeLog
 dist/
+
+# Open API Specification
+api.json
