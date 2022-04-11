@@ -226,7 +226,7 @@ if MAIL_SERVER == "":  # Mail into console
 
 
 # API specs configuration
-BACKEND_URL = str("BACKEND_URL", default="/")
+BACKEND_ROUTE = str("BACKEND_ROUTE", default="/")
 API_TITLE = 'EOSC Performance API'
 API_VERSION = 'v1'
 OPENAPI_VERSION = "3.0.2"
@@ -237,7 +237,7 @@ OPENAPI_SWAGGER_UI_URL = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
 
 API_SPEC_OPTIONS = {}
 API_SPEC_OPTIONS['security'] = [{"bearerAuth": []}]
-API_SPEC_OPTIONS['servers'] = [{"url": BACKEND_URL}]
+API_SPEC_OPTIONS['servers'] = [{"url": BACKEND_ROUTE}]
 API_SPEC_OPTIONS['components'] = {
     "securitySchemes": {
         "bearerAuth": {
@@ -245,8 +245,11 @@ API_SPEC_OPTIONS['components'] = {
             "scheme": "bearer",
             "bearerFormat": "JWT"
         }
-    },
-    "servers": [
-        {"url": "/api"}
-    ]
+    }
+}
+API_SPEC_OPTIONS['info'] = {
+    "license": {
+        "name": "MIT",
+        "url": "https://raw.githubusercontent.com/EOSC-synergy/eosc-perf/master/LICENSE",
+    }
 }

@@ -11,6 +11,18 @@ sys.path.append(cwd)
 from backend import create_app
 from backend.app import api
 
-app = create_app()
+app = create_app() 
 with open("api.json", "w") as outfile:
-    json.dump(api.spec.to_dict(), outfile, indent=4)
+    specs = api.spec.to_dict()
+    specs["info"]["title"] = "Swagger client library generator specs"
+    specs["servers"] = [
+        {
+            "url": f"https://perf.test.fedcloud.eu{app.config['BACKEND_ROUTE']}",
+            "description": "Development server",
+        },
+        {
+            "url": f"https://performance.services.fedcloud.eu{app.config['BACKEND_ROUTE']}",
+            "description": "Production server",
+        },
+    ]
+    json.dump(specs, outfile, indent=4)
