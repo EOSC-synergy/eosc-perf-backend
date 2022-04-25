@@ -1,5 +1,8 @@
 # EOSC Perf -- Backend
 
+[![Build Status](https://jenkins.eosc-synergy.eu/buildStatus/icon?job=eosc-synergy-org%2Feosc-perf-backend)](https://jenkins.eosc-synergy.eu/job/eosc-synergy-org/job/eosc-perf-backend/job/main/)
+[![Documentation Status](https://readthedocs.org/projects/perf/badge/?version=latest)](https://perf.readthedocs.io/en/latest/?badge=latest)
+
 EOSC Performance API service.
 
 # Prepare your environment
