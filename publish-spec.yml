@@ -1,0 +1,47 @@
+name: Publish new API spec
+
+on: [push]
+
+#on:
+#  release:
+#    types: [published]
+
+#permissions:
+#  contents: read
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.8'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build
+    
+    - name: Create. env
+      run: |
+        cp .env-example .env
+    
+    - name: Build package
+      run: python scripts/get-json-spec.json
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: API Specification
+        path: api-spec.json
+    
+    - name: Push spec to client repository
+      run: ../scripts/push-json-spec.sh eosc-perf-automation eosc-perf-client "${message}" github.com "${GITHUB_REF_NAME}"
+      working-directory: ./eosc-perf-client
+      env:
+        message: ${{ github.event.head_commit.message }}
+        GIT_TOKEN:  ${{secrets.AUTOMATED_CLIENT_TOKEN}} 
