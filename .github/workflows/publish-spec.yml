@@ -39,6 +39,9 @@ jobs:
       with:
         name: API Specification
         path: api-spec.json
+
+    - name: Make output dir
+      run: mkdir -p ./eosc-perf-client
     
     - name: Push spec to client repository
       run: ../scripts/push-json-spec.sh eosc-perf-automation eosc-perf-client "${message}" github.com "${GITHUB_REF_NAME}"
