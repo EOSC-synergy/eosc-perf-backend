@@ -228,7 +228,7 @@ if MAIL_SERVER == "":  # Mail into console
 # API specs configuration
 BACKEND_ROUTE = str("BACKEND_ROUTE", default="/")
 API_TITLE = 'EOSC Performance API'
-API_VERSION = 'v1'
+API_VERSION = '1.0.0'
 OPENAPI_VERSION = "3.0.2"
 OPENAPI_JSON_PATH = "api-spec.json"
 OPENAPI_URL_PREFIX = "/"
