@@ -48,11 +48,11 @@ jobs:
         name: API Specification
         path: api-spec.json
 
-    - run: mkdir -p ./eosc-perf-client
+    - run: mkdir -p ./eosc-perf-api-spec
     
-    - name: Push api-spec.json to client repository
-      run: ../scripts/push-json-spec.sh eosc-perf-automation eosc-perf-client "${message}" github.com "${GITHUB_REF_NAME}"
-      working-directory: ./eosc-perf-client
+    - name: Push api-spec.json to api spec repository
+      run: ../scripts/push-json-spec.sh eosc-perf-automation eosc-perf-api-spec "${message}" github.com "${GITHUB_REF_NAME}"
+      working-directory: ./eosc-perf-api-spec
       env:
         message: ${{ github.event.head_commit.message }}
         GIT_TOKEN:  ${{secrets.AUTOMATED_CLIENT_TOKEN}} 
