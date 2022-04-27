@@ -32,7 +32,7 @@ jobs:
         cp .env-example .env
     
     - name: Build package
-      run: python scripts/get-json-spec.json
+      run: python scripts/get-json-spec.py
 
     - uses: actions/upload-artifact@v3
       with:
