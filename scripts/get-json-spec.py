@@ -12,7 +12,7 @@ from backend import create_app
 from backend.app import api
 
 app = create_app() 
-with open("api.json", "w") as outfile:
+with open("api-spec.json", "w") as outfile:
     specs = api.spec.to_dict()
     specs["info"]["title"] = "Swagger client library generator specs"
     specs["servers"] = [

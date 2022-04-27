@@ -58,4 +58,4 @@ ChangeLog
 dist/
 
 # Open API Specification
-api.json
+api-spec.json
