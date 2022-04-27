@@ -37,23 +37,21 @@ jobs:
         pip install -r requirements.txt
         pip install build
 
-    - name: Create .env
-      run: |
+    - run: |
         cp .env-example .env
     
-    - name: Generate spec
+    - name: Generate api-spec.json
       run: python scripts/get-json-spec.py
 
-    - name: Upload spec as artifact
+    - name: Upload api-spec.json as artifact
       uses: actions/upload-artifact@v3
       with:
         name: API Specification
         path: api-spec.json
 
-    - name: Make output dir for pushing
-      run: mkdir -p ./eosc-perf-client
+    - run: mkdir -p ./eosc-perf-client
     
-    - name: Push spec to client repository
+    - name: Push api-spec.json to client repository
       run: ../scripts/push-json-spec.sh eosc-perf-automation eosc-perf-client "${message}" github.com "${GITHUB_REF_NAME}"
       working-directory: ./eosc-perf-client
       env:
