@@ -158,4 +158,3 @@ services:
       FLASK_APP: autoapp.py
       ...
 ```
-
