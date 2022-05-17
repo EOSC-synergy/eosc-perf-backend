@@ -15,7 +15,7 @@ blp = Blueprint(
 )
 
 collection_url = ""
-resource_url = "/<uuid:id>"
+resource_url = "/<uuid:tag_id>"
 
 
 @blp.route(collection_url, methods=["GET"])
@@ -133,21 +133,21 @@ def get(*args, **kwargs):
     return __get(*args, **kwargs)
 
 
-def __get(id):
+def __get(tag_id):
     """Returns the id matching tag.
 
     If no tag exists with the indicated id, then 404 NotFound
     exception is raised.
 
-    :param id: The id of the tag to retrieve
-    :type id: uuid
+    :param tag_id: The id of the tag to retrieve
+    :type tag_id: uuid
     :raises NotFound: No tag with id found
     :return: The database tag using the described id
     :rtype: :class:`models.Tag`
     """
-    tag = models.Tag.read(id)
+    tag = models.Tag.read(tag_id)
     if tag is None:
-        error_msg = f"Record {id} not found in the database"
+        error_msg = f"Record {tag_id} not found in the database"
         abort(404, messages={'error': error_msg})
     else:
         return tag
@@ -166,7 +166,7 @@ def update(*args, **kwargs):
     return __update(*args, **kwargs)
 
 
-def __update(body_args, id):
+def __update(body_args, tag_id):
     """Updates a benchmark specific fields.
 
     If no tag exists with the indicated id, then 404 NotFound
@@ -174,14 +174,14 @@ def __update(body_args, id):
 
     :param body_args: The request body arguments as python dictionary
     :type body_args: dict
-    :param id: The id of the tag to update
-    :type id: uuid
+    :param tag_id: The id of the tag to update
+    :type tag_id: uuid
     :raises Unauthorized: The server could not verify the user identity
     :raises Forbidden: The user has not the required privileges
     :raises NotFound: No tag with id found
     :raises UnprocessableEntity: Wrong query/body parameters
     """
-    tag = __get(id)
+    tag = __get(tag_id)
     tag.update(body_args)  # Only admins reach here
 
     try:  # Transaction execution
@@ -203,23 +203,23 @@ def delete(*args, **kwargs):
     return __delete(*args, **kwargs)
 
 
-def __delete(id):
+def __delete(tag_id):
     """Deletes the id matching tag.
 
     If no tag exists with the indicated id, then 404 NotFound
     exception is raised.
 
-    :param id: The id of the tag to delete
-    :type id: uuid
+    :param tag_id: The id of the tag to delete
+    :type tag_id: uuid
     :raises Unauthorized: The server could not verify the user identity
     :raises Forbidden: The user has not the required privileges
     :raises NotFound: No tag with id found
     """
-    tag = __get(id)
+    tag = __get(tag_id)
     tag.delete()
 
     try:  # Transaction execution
         db.session.commit()
     except IntegrityError:
-        error_msg = f"Conflict deleting {id}"
+        error_msg = f"Conflict deleting {tag_id}"
         abort(409, messages={'error': error_msg})

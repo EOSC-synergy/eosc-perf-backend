@@ -13,7 +13,7 @@ blp = Blueprint(
 )
 
 collection_url = ""
-resource_url = "/<uuid:id>"
+resource_url = "/<uuid:flavor_id>"
 
 
 @blp.route(resource_url, methods=["GET"])
@@ -27,21 +27,21 @@ def get(*args, **kwargs):
     return __get(*args, **kwargs)
 
 
-def __get(id):
+def __get(flavor_id):
     """Returns the id matching flavor.
 
     If no flavor exists with the indicated id, then 404 NotFound
     exception is raised.
 
-    :param id: The id of the flavor to retrieve
-    :type id: uuid
+    :param flavor_id: The id of the flavor to retrieve
+    :type flavor_id: uuid
     :raises NotFound: No flavor with id found
     :return: The database flavor using the described id
     :rtype: :class:`models.Flavor`
     """
-    flavor = models.Flavor.read(id)
+    flavor = models.Flavor.read(flavor_id)
     if flavor is None:
-        error_msg = f"Record {id} not found in the database"
+        error_msg = f"Record {flavor_id} not found in the database"
         abort(404, messages={'error': error_msg})
     else:
         return flavor
@@ -60,7 +60,7 @@ def update(*args, **kwargs):
     return __update(*args, **kwargs)
 
 
-def __update(body_args, id):
+def __update(body_args, flavor_id):
     """Updates a flavor specific fields.
 
     If no flavor exists with the indicated id, then 404 NotFound
@@ -68,16 +68,16 @@ def __update(body_args, id):
 
     :param body_args: The request body arguments as python dictionary
     :type body_args: dict
-    :param id: The id of the flavor to update
-    :type id: uuid
+    :param flavor_id: The id of the flavor to update
+    :type flavor_id: uuid
     :raises Unauthorized: The server could not verify the user identity
     :raises Forbidden: The user has not the required privileges
     :raises NotFound: No flavor with id found
     :raises UnprocessableEntity: Wrong query/body parameters
     """
-    flavor = models.Flavor.read(id)
+    flavor = models.Flavor.read(flavor_id)
     if flavor is None:
-        error_msg = f"Record {id} not found in the database"
+        error_msg = f"Record {flavor_id} not found in the database"
         abort(404, messages={'error': error_msg})
 
     flavor.update(body_args, force=True)  # Only admins reach here
@@ -101,21 +101,21 @@ def delete(*args, **kwargs):
     return __delete(*args, **kwargs)
 
 
-def __delete(id):
+def __delete(flavor_id):
     """Deletes the id matching flavor.
 
     If no flavor exists with the indicated id, then 404 NotFound
     exception is raised.
 
-    :param id: The id of the flavor to delete
-    :type id: uuid
+    :param flavor_id: The id of the flavor to delete
+    :type flavor_id: uuid
     :raises Unauthorized: The server could not verify the user identity
     :raises Forbidden: The user has not the required privileges
     :raises NotFound: No flavor with id found
     """
-    flavor = models.Flavor.read(id)
+    flavor = models.Flavor.read(flavor_id)
     if flavor is None:
-        error_msg = f"Record {id} not found in the database"
+        error_msg = f"Record {flavor_id} not found in the database"
         abort(404, messages={'error': error_msg})
 
     flavor.delete()
@@ -123,7 +123,7 @@ def __delete(id):
     try:  # Transaction execution
         db.session.commit()
     except IntegrityError:
-        error_msg = f"Conflict deleting {id}"
+        error_msg = f"Conflict deleting {flavor_id}"
         abort(409, messages={'error': error_msg})
 
 
@@ -141,27 +141,27 @@ def approve(*args, **kwargs):
     return __approve(*args, **kwargs)
 
 
-def __approve(id):
+def __approve(flavor_id):
     """Approves a flavor to include it on default list methods.
 
-    :param id: The id of the flavor to approve
-    :type id: uuid
+    :param flavor_id: The id of the flavor to approve
+    :type flavor_id: uuid
     :raises Unauthorized: The server could not verify the user identity
     :raises Forbidden: The user has not the required privileges
     :raises NotFound: No flavor with id found
     """
-    flavor = __get(id)
+    flavor = __get(flavor_id)
 
     try:  # Approve flavor
         flavor.approve()
     except RuntimeError:
-        error_msg = f"Flavor {id} was already approved"
+        error_msg = f"Flavor {flavor_id} was already approved"
         abort(422, messages={'error': error_msg})
 
     try:  # Transaction execution
         db.session.commit()
     except IntegrityError:
-        error_msg = f"Conflict deleting {id}"
+        error_msg = f"Conflict deleting {flavor_id}"
         abort(409, messages={'error': error_msg})
 
     notifications.resource_approved(flavor)
@@ -184,28 +184,28 @@ def reject(*args, **kwargs):
     return __reject(*args, **kwargs)
 
 
-def __reject(id):
+def __reject(flavor_id):
     """Rejects a flavor to safe delete it.
 
-    :param id: The id of the flavor to reject
-    :type id: uuid
+    :param flavor_id: The id of the flavor to reject
+    :type flavor_id: uuid
     :raises Unauthorized: The server could not verify the user identity
     :raises Forbidden: The user has not the required privileges
     :raises NotFound: No flavor with id found
     """
-    flavor = __get(id)
+    flavor = __get(flavor_id)
     uploader = flavor.uploader
 
     try:  # Reject flavor
         flavor.reject()
     except RuntimeError:
-        error_msg = f"Flavor {id} was already approved"
+        error_msg = f"Flavor {flavor_id} was already approved"
         abort(422, messages={'error': error_msg})
 
     try:  # Transaction execution
         db.session.commit()
     except IntegrityError:
-        error_msg = f"Conflict deleting {id}"
+        error_msg = f"Conflict deleting {flavor_id}"
         abort(409, messages={'error': error_msg})
 
     notifications.resource_rejected(uploader, flavor)
@@ -223,17 +223,17 @@ def site(*args, **kwargs):
     return __site(*args, **kwargs)
 
 
-def __site(id):
+def __site(flavor_id):
     """Returns the flavor site.
 
     If no flavor exists with the indicated id, then 404 NotFound
     exception is raised.
 
-    :param id: The id of the flavor contained by the site
-    :type id: uuid
+    :param flavor_id: The id of the flavor contained by the site
+    :type flavor_id: uuid
     :raises NotFound: No flavor with id found
     :return: The database site which contains the described id
     :rtype: :class:`models.Site`
     """
-    flavor = __get(id)
+    flavor = __get(flavor_id)
     return models.Site.read(flavor.site_id)

@@ -18,7 +18,7 @@ blp = Blueprint(
 )
 
 collection_url = ""
-resource_url = "/<uuid:id>"
+resource_url = "/<uuid:result_id>"
 
 
 @blp.route(collection_url, methods=["GET"])
@@ -158,13 +158,13 @@ def __create(query_args, body_args):
         error_msg = "Execution date cannot be in future"
         abort(422, messages={'error': error_msg})
 
-    def get(model, id):
-        item = model.read(id)
+    def get(model, result_id):
+        item = model.read(result_id)
         if item is None:
-            error_msg = f"{item.__class__.__name__} {id} not in database"
+            error_msg = f"{item.__class__.__name__} {result_id} not in database"
             abort(404, messages={'error': error_msg})
         elif hasattr(item, "status") and item.status.name != "approved":
-            error_msg = f"{item.__class__.__name__} {id} not approved"
+            error_msg = f"{item.__class__.__name__} {result_id} not approved"
             abort(422, messages={'error': error_msg})
         else:
             return item
@@ -240,21 +240,21 @@ def get(*args, **kwargs):
     return __get(*args, **kwargs)
 
 
-def __get(id):
+def __get(result_id):
     """Returns the id matching result.
 
     If no result exists with the indicated id, then 404 NotFound
     exception is raised.
 
-    :param id: The id of the result to retrieve
-    :type id: uuid
+    :param result_id: The id of the result to retrieve
+    :type result_id: uuid
     :raises NotFound: No result with id found
     :return: The database result using the described id
     :rtype: :class:`models.Result`
     """
-    result = models.Result.read(id, with_deleted=True)
+    result = models.Result.read(result_id, with_deleted=True)
     if result is None:
-        error_msg = f"Result {id} not found in the database"
+        error_msg = f"Result {result_id} not found in the database"
         abort(404, messages={'error': error_msg})
     else:
         return result
@@ -272,25 +272,25 @@ def delete(*args, **kwargs):
     return __delete(*args, **kwargs)
 
 
-def __delete(id):
+def __delete(result_id):
     """Deletes the id matching result.
 
     If no result exists with the indicated id, then 404 NotFound
     exception is raised.
 
-    :param id: The id of the result to delete
-    :type id: uuid
+    :param result_id: The id of the result to delete
+    :type result_id: uuid
     :raises Unauthorized: The server could not verify the user identity
     :raises Forbidden: The user has not the required privileges
     :raises NotFound: No result with id found
     """
-    result = __get(id)
+    result = __get(result_id)
     result.delete()
 
     try:  # Transaction execution
         db.session.commit()
     except IntegrityError:
-        error_msg = f"Conflict deleting {id}"
+        error_msg = f"Conflict deleting {result_id}"
         abort(409, messages={'error': error_msg})
 
 
@@ -310,26 +310,26 @@ def claim(*args, **kwargs):
     return __claim(*args, **kwargs)
 
 
-def __claim(body_args, id):
+def __claim(body_args, result_id):
     """Creates a claim linked to the report
 
     If no result exists with the indicated id, then 404 NotFound
     exception is raised.
 
-    :param id: The id of the result created by the returned user
-    :type id: uuid
+    :param result_id: The id of the result created by the returned user
+    :type result_id: uuid
     :raises Unauthorized: The server could not verify the user identity
     :raises Forbidden: The user is not registered
     :raises NotFound: No result with id found
     :raises UnprocessableEntity: Wrong query/body parameters
     """
-    result = __get(id)
+    result = __get(result_id)
     claim = result.claim(message=body_args['message'])
 
     try:  # Transaction execution
         db.session.commit()
     except IntegrityError:
-        error_msg = f"Conflict updating {id}"
+        error_msg = f"Conflict updating {result_id}"
         abort(409, messages={'error': error_msg})
 
     notifications.result_claimed(result, claim)
@@ -349,7 +349,7 @@ def update_tags(*args, **kwargs):
     return __update_tags(*args, **kwargs)
 
 
-def __update_tags(body_args, id):
+def __update_tags(body_args, result_id):
     """Updates a result specific fields.
 
     If no result exists with the indicated id, then 404 NotFound
@@ -357,14 +357,14 @@ def __update_tags(body_args, id):
 
     :param body_args: The request body arguments as python dictionary
     :type body_args: dict
-    :param id: The id of the result to update
-    :type id: uuid
+    :param result_id: The id of the result to update
+    :type result_id: uuid
     :raises Unauthorized: The server could not verify the user identity
     :raises Forbidden: The user has not the required privileges
     :raises NotFound: No result with id found
     :raises UnprocessableEntity: Wrong query/body parameters
     """
-    result = __get(id)
+    result = __get(result_id)
 
     if 'tags_ids' in body_args:
         tags_ids = body_args.pop('tags_ids')
@@ -378,7 +378,7 @@ def __update_tags(body_args, id):
     try:  # Transaction execution
         db.session.commit()
     except IntegrityError:
-        error_msg = f"Conflict updating {id}"
+        error_msg = f"Conflict updating {result_id}"
         abort(409, messages={'error': error_msg})
 
 
@@ -398,17 +398,17 @@ def list_claims(*args, **kwargs):
     return __list_claims(*args, **kwargs)
 
 
-def __list_claims(query_args, id):
+def __list_claims(query_args, result_id):
     """Returns the result claims filtered by the query args.
 
     :param query_args: The request query arguments as python dictionary
     :type query_args: dict
-    :param id: The id of the result from to collect the claims
-    :type id: uuid
+    :param result_id: The id of the result from to collect the claims
+    :type result_id: uuid
     :raises Unauthorized: The server could not verify your identity
     :raises Forbidden: You don't have the administrator rights
     """
-    result = __get(id)
+    result = __get(result_id)
 
     if auth.valid_admin():
         pass
@@ -418,7 +418,7 @@ def __list_claims(query_args, id):
         abort(403)
 
     query = models.Result._claim_report_class.query
-    return query.filter_by(resource_id=id, **query_args)
+    return query.filter_by(resource_id=result_id, **query_args)
 
 
 @blp.route(resource_url + "/uploader", methods=["GET"])
@@ -434,16 +434,16 @@ def get_uploader(*args, **kwargs):
     return __get_uploader(*args, **kwargs)
 
 
-def __get_uploader(id):
+def __get_uploader(result_id):
     """Returns the uploader of the id matching result.
 
     If no result exists with the indicated id, then 404 NotFound
     exception is raised.
 
-    :param id: The id of the result created by the returned user
-    :type id: uuid
+    :param result_id: The id of the result created by the returned user
+    :type result_id: uuid
     :raises Unauthorized: The server could not verify the user identity
     :raises Forbidden: The user has not the required privileges
     :raises NotFound: No result with id found
     """
-    return __get(id).uploader
+    return __get(result_id).uploader

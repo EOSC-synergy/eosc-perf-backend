@@ -15,7 +15,7 @@ blp = Blueprint(
 )
 
 collection_url = ""
-resource_url = "/<uuid:id>"
+resource_url = "/<uuid:benchmark_id>"
 
 
 @blp.route(collection_url, methods=["GET"])
@@ -152,21 +152,21 @@ def get(*args, **kwargs):
     return __get(*args, **kwargs)
 
 
-def __get(id):
+def __get(benchmark_id):
     """Returns the id matching benchmark.
 
     If no benchmark exists with the indicated id, then 404 NotFound
     exception is raised.
 
-    :param id: The id of the benchmark to retrieve
-    :type id: uuid
+    :param benchmark_id: The id of the benchmark to retrieve
+    :type benchmark_id: uuid
     :raises NotFound: No benchmark with id found
     :return: The database benchmark using the described id
     :rtype: :class:`models.Benchmark`
     """
-    benchmark = models.Benchmark.read(id)
+    benchmark = models.Benchmark.read(benchmark_id)
     if benchmark is None:
-        error_msg = f"Benchmark {id} not found in the database"
+        error_msg = f"Benchmark {benchmark_id} not found in the database"
         abort(404, messages={'error': error_msg})
     else:
         return benchmark
@@ -185,7 +185,7 @@ def update(*args, **kwargs):
     return __update(*args, **kwargs)
 
 
-def __update(body_args, id):
+def __update(body_args, benchmark_id):
     """Updates a benchmark specific fields.
 
     If no benchmark exists with the indicated id, then 404 NotFound
@@ -193,8 +193,8 @@ def __update(body_args, id):
 
     :param body_args: The request body arguments as python dictionary
     :type body_args: dict
-    :param id: The id of the benchmark to update
-    :type id: uuid
+    :param benchmark_id: The id of the benchmark to update
+    :type benchmark_id: uuid
     :raises Unauthorized: The server could not verify the user identity
     :raises Forbidden: The user has not the required privileges
     :raises NotFound: No benchmark with id found
@@ -205,7 +205,7 @@ def __update(body_args, id):
         error_msg = f"Image {image}:{tag} not found in dockerhub"
         abort(422, messages={'error': error_msg})
 
-    benchmark = __get(id)
+    benchmark = __get(benchmark_id)
     benchmark.update(body_args, force=True)  # Only admins reach here
 
     try:  # Transaction execution
@@ -228,25 +228,25 @@ def delete(*args, **kwargs):
     return __delete(*args, **kwargs)
 
 
-def __delete(id):
+def __delete(benchmark_id):
     """Deletes the id matching benchmark.
 
     If no benchmark exists with the indicated id, then 404 NotFound
     exception is raised.
 
-    :param id: The id of the benchmark to delete
-    :type id: uuid
+    :param benchmark_id: The id of the benchmark to delete
+    :type benchmark_id: uuid
     :raises Unauthorized: The server could not verify the user identity
     :raises Forbidden: The user has not the required privileges
     :raises NotFound: No benchmark with id found
     """
-    benchmark = __get(id)
+    benchmark = __get(benchmark_id)
     benchmark.delete()
 
     try:  # Transaction execution
         db.session.commit()
     except IntegrityError:
-        error_msg = f"Conflict deleting {id}"
+        error_msg = f"Conflict deleting {benchmark_id}"
         abort(409, messages={'error': error_msg})
 
 
@@ -265,27 +265,27 @@ def approve(*args, **kwargs):
     return __approve(*args, **kwargs)
 
 
-def __approve(id):
+def __approve(benchmark_id):
     """Approves a benchmark to include it on default list methods.
 
-    :param id: The id of the benchmark to approve
-    :type id: uuid
+    :param benchmark_id: The id of the benchmark to approve
+    :type benchmark_id: uuid
     :raises Unauthorized: The server could not verify the user identity
     :raises Forbidden: The user has not the required privileges
     :raises NotFound: No benchmark with id found
     """
-    benchmark = __get(id)
+    benchmark = __get(benchmark_id)
 
     try:  # Approve benchmark
         benchmark.approve()
     except RuntimeError:
-        error_msg = f"Benchmark {id} was already approved"
+        error_msg = f"Benchmark {benchmark_id} was already approved"
         abort(422, messages={'error': error_msg})
 
     try:  # Transaction execution
         db.session.commit()
     except IntegrityError:
-        error_msg = f"Conflict deleting {id}"
+        error_msg = f"Conflict deleting {benchmark_id}"
         abort(409, messages={'error': error_msg})
 
     notifications.resource_approved(benchmark)
@@ -308,27 +308,27 @@ def reject(*args, **kwargs):
     return __reject(*args, **kwargs)
 
 
-def __reject(id):
+def __reject(benchmark_id):
     """Rejects a benchmark to safe delete it.
-    :param id: The id of the benchmark to reject
-    :type id: uuid
+    :param benchmark_id: The id of the benchmark to reject
+    :type benchmark_id: uuid
     :raises Unauthorized: The server could not verify the user identity
     :raises Forbidden: The user has not the required privileges
     :raises NotFound: No benchmark with id found
     """
-    benchmark = __get(id)
+    benchmark = __get(benchmark_id)
     uploader = benchmark.uploader
 
     try:  # Reject benchmark
         benchmark.reject()
     except RuntimeError:
-        error_msg = f"Benchmark {id} was already approved"
+        error_msg = f"Benchmark {benchmark_id} was already approved"
         abort(422, messages={'error': error_msg})
 
     try:  # Transaction execution
         db.session.commit()
     except IntegrityError:
-        error_msg = f"Conflict deleting {id}"
+        error_msg = f"Conflict deleting {benchmark_id}"
         abort(409, messages={'error': error_msg})
 
     notifications.resource_rejected(uploader, benchmark)

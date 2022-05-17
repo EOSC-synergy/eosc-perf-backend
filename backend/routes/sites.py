@@ -15,7 +15,7 @@ blp = Blueprint(
 )
 
 collection_url = ""
-resource_url = "/<uuid:id>"
+resource_url = "/<uuid:site_id>"
 
 
 @blp.route(collection_url, methods=['GET'])
@@ -137,21 +137,21 @@ def get(*args, **kwargs):
     return __get(*args, **kwargs)
 
 
-def __get(id):
+def __get(site_id):
     """Returns the id matching site.
 
     If no site exists with the indicated id, then 404 NotFound
     exception is raised.
 
-    :param id: The id of the site to retrieve
-    :type id: uuid
+    :param site_id: The id of the site to retrieve
+    :type site_id: uuid
     :raises NotFound: No site with id found
     :return: The database site using the described id
     :rtype: :class:`models.Site`
     """
-    site = models.Site.read(id)
+    site = models.Site.read(site_id)
     if site is None:
-        error_msg = f"Record {id} not found in the database"
+        error_msg = f"Record {site_id} not found in the database"
         abort(404, messages={'error': error_msg})
     else:
         return site
@@ -170,7 +170,7 @@ def update(*args, **kwargs):
     return __update(*args, **kwargs)
 
 
-def __update(body_args, id):
+def __update(body_args, site_id):
     """Updates a site specific fields.
 
     If no site exists with the indicated id, then 404 NotFound
@@ -178,14 +178,14 @@ def __update(body_args, id):
 
     :param body_args: The request body arguments as python dictionary
     :type body_args: dict
-    :param id: The id of the site to update
-    :type id: uuid
+    :param site_id: The id of the site to update
+    :type site_id: uuid
     :raises Unauthorized: The server could not verify the user identity
     :raises Forbidden: The user has not the required privileges
     :raises NotFound: No site with id found
     :raises UnprocessableEntity: Wrong query/body parameters
     """
-    site = __get(id)
+    site = __get(site_id)
     site.update(body_args, force=True)  # Only admins reach here
 
     try:  # Transaction execution
@@ -207,25 +207,25 @@ def delete(*args, **kwargs):
     return __delete(*args, **kwargs)
 
 
-def __delete(id):
+def __delete(site_id):
     """Deletes the id matching site.
 
     If no site exists with the indicated id, then 404 NotFound
     exception is raised.
 
-    :param id: The id of the site to delete
-    :type id: uuid
+    :param site_id: The id of the site to delete
+    :type site_id: uuid
     :raises Unauthorized: The server could not verify the user identity
     :raises Forbidden: The user has not the required privileges
     :raises NotFound: No site with id found
     """
-    site = __get(id)
+    site = __get(site_id)
     site.delete()
 
     try:  # Transaction execution
         db.session.commit()
     except IntegrityError:
-        error_msg = f"Conflict deleting {id}"
+        error_msg = f"Conflict deleting {site_id}"
         abort(409, messages={'error': error_msg})
 
 
@@ -243,27 +243,27 @@ def approve(*args, **kwargs):
     return __approve(*args, **kwargs)
 
 
-def __approve(id):
+def __approve(site_id):
     """Approves a site to include it on default list methods.
 
-    :param id: The id of the site to approve
-    :type id: uuid
+    :param site_id: The id of the site to approve
+    :type site_id: uuid
     :raises Unauthorized: The server could not verify the user identity
     :raises Forbidden: The user has not the required privileges
     :raises NotFound: No site with id found
     """
-    site = __get(id)
+    site = __get(site_id)
 
     try:  # Approve site
         site.approve()
     except RuntimeError:
-        error_msg = f"Site {id} was already approved"
+        error_msg = f"Site {site_id} was already approved"
         abort(422, messages={'error': error_msg})
 
     try:  # Transaction execution
         db.session.commit()
     except IntegrityError:
-        error_msg = f"Conflict deleting {id}"
+        error_msg = f"Conflict deleting {site_id}"
         abort(409, messages={'error': error_msg})
 
     notifications.resource_approved(site)
@@ -286,28 +286,28 @@ def reject(*args, **kwargs):
     return __reject(*args, **kwargs)
 
 
-def __reject(id):
+def __reject(site_id):
     """Rejects a site to safe delete it.
 
-    :param id: The id of the site to reject
-    :type id: uuid
+    :param site_id: The id of the site to reject
+    :type site_id: uuid
     :raises Unauthorized: The server could not verify the user identity
     :raises Forbidden: The user has not the required privileges
     :raises NotFound: No site with id found
     """
-    site = __get(id)
+    site = __get(site_id)
     uploader = site.uploader
 
     try:  # Reject site
         site.reject()
     except RuntimeError:
-        error_msg = f"Site {id} was already approved"
+        error_msg = f"Site {site_id} was already approved"
         abort(422, messages={'error': error_msg})
 
     try:  # Transaction execution
         db.session.commit()
     except IntegrityError:
-        error_msg = f"Conflict deleting {id}"
+        error_msg = f"Conflict deleting {site_id}"
         abort(409, messages={'error': error_msg})
 
     notifications.resource_rejected(uploader, site)
@@ -330,20 +330,20 @@ def list_flavors(*args, **kwargs):
     return __list_flavors(*args, **kwargs)
 
 
-def __list_flavors(query_args, id):
+def __list_flavors(query_args, site_id):
     """ Lists the site flavors.
 
     :param query_args: The request query arguments as python dictionary
     :type query_args: dict
-    :param id: The id of the site to query the flavors
-    :type id: uuid
+    :param site_id: The id of the site to query the flavors
+    :type site_id: uuid
     :raises UnprocessableEntity: Wrong query/body parameters
     :return: Pagination object with filtered flavors
     :rtype: :class:`flask_sqlalchemy.Pagination`
     """
-    __get(id)   # Return 404 if the site does not exist
+    __get(site_id)   # Return 404 if the site does not exist
     query = models.Flavor.query
-    return query.filter_by(site_id=id, **query_args)
+    return query.filter_by(site_id=site_id, **query_args)
 
 
 @blp.route(resource_url + '/flavors', methods=['POST'])
@@ -361,13 +361,13 @@ def create_flavor(*args, **kwargs):
     return __create_flavor(*args, **kwargs)
 
 
-def __create_flavor(body_args, id):
+def __create_flavor(body_args, site_id):
     """Creates a flavor linked to a site id.
 
     :param body_args: The request body arguments as python dictionary
     :type body_args: dict
-    :param id: The id of the site where to add the flavor
-    :type id: uuid
+    :param site_id: The id of the site where to add the flavor
+    :type site_id: uuid
     :raises Unauthorized: The server could not verify the user identity
     :raises Forbidden: The user is not registered
     :raises Conflict: Created object conflicts a database item
@@ -375,8 +375,8 @@ def __create_flavor(body_args, id):
     :return: The flavor created into the database.
     :rtype: :class:`models.Flavor`
     """
-    __get(id)   # Return 404 if the site does not exist
-    body_args['site_id'] = id
+    __get(site_id)   # Return 404 if the site does not exist
+    body_args['site_id'] = site_id
     flavor = models.Flavor.create(body_args)
 
     try:  # Transaction execution
@@ -408,7 +408,7 @@ def search_flavors(*args, **kwargs):
     return __search_flavors(*args, **kwargs)
 
 
-def __search_flavors(query_args, id):
+def __search_flavors(query_args, site_id):
     """Search flavors inside a site following generic terms.
 
     :param query_args: The request query arguments as python dictionary
@@ -417,8 +417,8 @@ def __search_flavors(query_args, id):
     :return: Pagination object with filtered flavors
     :rtype: :class:`flask_sqlalchemy.Pagination`
     """
-    __get(id)   # Return 404 if the site does not exist
-    search = models.Flavor.query.filter_by(site_id=id)
+    __get(site_id)   # Return 404 if the site does not exist
+    search = models.Flavor.query.filter_by(site_id=site_id)
     for keyword in query_args.pop('terms'):
         search = search.filter(
             or_(

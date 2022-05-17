@@ -15,7 +15,7 @@ blp = Blueprint(
 
 submits_url = '/submits'
 result_claims_url = '/claims'
-result_claim_url = result_claims_url + '/<uuid:id>'
+result_claim_url = result_claims_url + '/<uuid:report_id>'
 
 
 @blp.route(submits_url, methods=['GET'])
@@ -96,21 +96,21 @@ def get(*args, **kwargs):
     return __get(*args, **kwargs)
 
 
-def __get(id):
+def __get(report_id):
     """Returns the id matching claim.
 
     If no result exists with the indicated id, then 404 NotFound
     exception is raised.
 
-    :param id: The id of the claim to retrieve
-    :type id: uuid
+    :param report_id: The id of the claim to retrieve
+    :type report_id: uuid
     :raises NotFound: No claim with id found
     :return: The database result using the described id
     :rtype: :class:`models.Claim`
     """
-    claim = models.Claim.read(id)
+    claim = models.Claim.read(report_id)
     if claim is None:
-        error_msg = f"Claim {id} not found in the database"
+        error_msg = f"Claim {report_id} not found in the database"
         abort(404, messages={'error': error_msg})
     else:
         return claim
@@ -131,34 +131,34 @@ def approve_claim(*args, **kwargs):
     return __approve_claim(*args, **kwargs)
 
 
-def __approve_claim(id):
+def __approve_claim(report_id):
     """Accepts the id matching claim.
 
     If no submit exists with the indicated id, then 404 NotFound
     exception is raised.
 
-    :param id: The id of the submit to approve
-    :type id: uuid
+    :param report_id: The id of the submit to approve
+    :type report_id: uuid
     :raises Unauthorized: The server could not verify the user identity
     :raises Forbidden: The user has not the required privileges
     :raises NotFound: No submit with id found
     :raises UnprocessableEntity: Resource already approved
     """
-    claim = models.Claim.read(id)
+    claim = models.Claim.read(report_id)
     if claim is None:
-        error_msg = f"Claim {id} not found in the database"
+        error_msg = f"Claim {report_id} not found in the database"
         abort(404, messages={'error': error_msg})
 
     try:  # Approve claim resource
         claim.approve()
     except RuntimeError:
-        error_msg = f"Resource {id} was already approved"
+        error_msg = f"Resource {report_id} was already approved"
         abort(422, messages={'error': error_msg})
 
     try:  # Transaction execution
         db.session.commit()
     except IntegrityError:
-        error_msg = f"Conflict deleting {id}"
+        error_msg = f"Conflict deleting {report_id}"
         abort(409, messages={'error': error_msg})
 
     notifications.resource_approved(claim)
@@ -179,35 +179,35 @@ def reject_claim(*args, **kwargs):
     return __reject_claim(*args, **kwargs)
 
 
-def __reject_claim(id):
+def __reject_claim(report_id):
     """Refuses the id matching claim.
 
     If no submit exists with the indicated id, then 404 NotFound
     exception is raised.
 
-    :param id: The id of the submit to reject
-    :type id: uuid
+    :param report_id: The id of the submit to reject
+    :type report_id: uuid
     :raises Unauthorized: The server could not verify the user identity
     :raises Forbidden: The user has not the required privileges
     :raises NotFound: No benchmark with id found
     :raises UnprocessableEntity: Resource already approved
     """
-    claim = models.Claim.read(id)
+    claim = models.Claim.read(report_id)
     if claim is None:
-        error_msg = f"Claim {id} not found in the database"
+        error_msg = f"Claim {report_id} not found in the database"
         abort(404, messages={'error': error_msg})
 
     uploader = claim.uploader
     try:  # Reject claim resource
         claim.reject()
     except RuntimeError:
-        error_msg = f"Resource {id} was already approved"
+        error_msg = f"Resource {report_id} was already approved"
         abort(422, messages={'error': error_msg})
 
     try:  # Transaction execution
         db.session.commit()
     except IntegrityError:
-        error_msg = f"Conflict deleting {id}"
+        error_msg = f"Conflict deleting {report_id}"
         abort(409, messages={'error': error_msg})
 
     notifications.resource_rejected(uploader, claim)
