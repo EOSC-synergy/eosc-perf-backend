@@ -4,10 +4,11 @@
 # It uses environment variables to configure the database 
 # To load your .env file use `export $(grep -v '^#' .env | xargs)`
 
+docker volume create perf_data
 docker run -v $PWD/data:/data \
     --publish=5432:$DB_PORT \
     --env POSTGRES_USER=$DB_USER \
     --env POSTGRES_PASSWORD=$DB_PASSWORD \
     --env POSTGRES_DB=$DB_NAME \
-    --env PGDATA=/data \
+    --env perf_data=/data \
     postgres
