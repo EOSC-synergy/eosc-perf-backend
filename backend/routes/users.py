@@ -178,17 +178,17 @@ def __search(query_args):
 
 @blp.route(resource_url, methods=["GET"])
 @blp.doc(operationId='GetSelf')
-@flaat.access_level("user")
+@flaat.inject_user_infos() # Fail if no valid authentication is provided
 @blp.response(200, schemas.User)
-def get(*args, **kwargs):
+def get(user_infos, *args, **kwargs):
     """(Users) Retrieves the logged in user info
 
     Use this method to retrieve your user data stored in the database.
     """
-    return __get(*args, **kwargs)
+    return __get(user_infos, *args, **kwargs)
 
 
-def __get():
+def __get(user_infos):
     """Retrieves the current request user.
 
     :raises Unauthorized: The server could not verify your identity
@@ -196,7 +196,7 @@ def __get():
     :return: The database user matching the oidc token information
     :rtype: :class:`models.User`
     """
-    user = models.User.current_user()
+    user = models.User.read((user_infos['sub'], user_infos['iss']))
     if user is None:
         error_msg = "User not registered"
         abort(404, messages={'error': error_msg})
@@ -207,32 +207,32 @@ def __get():
 @blp.route(resource_url + ':update', methods=["POST"])
 @blp.doc(operationId='UpdateSelf')
 @flaat.access_level("user")
+@flaat.inject_user_infos()
 @blp.response(204)
-def update(*args, **kwargs):
+def update(user_infos, *args, **kwargs):
     """(Users) Updates the logged in user info
 
     Use this method to update your user data in the database. The method
     returns by default 204, use a GET method to retrieve the new status
     of your data.
     """
-    return __update(*args, **kwargs)
+    return __update(user_infos, *args, **kwargs)
 
 
-def __update():
+def __update(user_infos):
     """ Updates the user information from introspection endpoint.
 
     :raises Unauthorized: The server could not verify your identity
     :raises Forbidden: You are not registered
     """
     user = __get()
-    user_info = flaat.current_userinfo()
-    if not user_info:
-        error_msg = "No user info received from 'introspection endpoint'"
+    if not user_infos:
+        error_msg = "No user info received from token nor introspection"
         abort(500, messages={'error': error_msg})
-    elif 'email' not in user_info:
+    elif 'email' not in user_infos:
         abort(422, messages={'error': "No scope for email in oidc token"})
 
-    user.update({'email': user_info['email']})
+    user.update({'email': user_infos['email']})
 
     try:  # Transaction execution
         db.session.commit()
@@ -263,28 +263,29 @@ def try_admin():
 @blp.route(resource_url + "/results", methods=["GET"])
 @blp.doc(operationId='ListUserResults')
 @flaat.access_level("user")
+@flaat.inject_user_infos()
 @blp.arguments(args.ResultFilter, location='query')
 @blp.response(200, schemas.Results)
 @queries.to_pagination()
 @queries.add_sorting(models.Result)
 @queries.add_datefilter(models.Result)
-def results(*args, **kwargs):
+def results(user_infos, *args, **kwargs):
     """(Users) Returns your uploaded results
 
     Use this method to retrieve all the results uploaded by your user.
     You can use the query parameter to retrieve also those with pending
     claims.
     """
-    return __results(*args, **kwargs)
+    return __results(user_infos, *args, **kwargs)
 
 
-def __results(query_args):
+def __results(user_infos, query_args):
     """Returns the user uploaded results filtered by the query args.
 
     :raises Unauthorized: The server could not verify your identity
     :raises Forbidden: You don't have the administrator rights
     """
-    user = __get()
+    user = __get(user_infos)
     query = results_routes.__list(query_args)
     return query.with_deleted().filter_by(uploader=user)
 
@@ -292,25 +293,26 @@ def __results(query_args):
 @blp.route(resource_url + "/claims", methods=["GET"])
 @blp.doc(operationId='ListUserClaims')
 @flaat.access_level("user")
+@flaat.inject_user_infos()
 @blp.arguments(args.ClaimFilter, location='query')
 @blp.response(200, schemas.Claims)
 @queries.to_pagination()
 @queries.add_sorting(models.Claim)
 @queries.add_datefilter(models.Claim)
-def claims(*args, **kwargs):
+def claims(user_infos, *args, **kwargs):
     """(Users) Returns your uploaded pending claims
 
     Use this method to retrieve all the claims uploaded by your user.
     """
-    return __claims(*args, **kwargs)
+    return __claims(user_infos, *args, **kwargs)
 
 
-def __claims(query_args):
+def __claims(user_infos, query_args):
     """Returns the user uploaded claims filtered by the query args.
 
     :raises Unauthorized: The server could not verify your identity
     :raises Forbidden: You don't have the administrator rights
     """
-    user = __get()
+    user = __get(user_infos)
     query = models.Claim.query
     return query.filter_by(uploader=user, **query_args)

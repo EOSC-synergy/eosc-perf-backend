@@ -5,7 +5,6 @@ from sqlalchemy import Column, DateTime, Text
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import backref, relationship
 
-from ...extensions import flaat
 from ..core import TokenModel
 
 
@@ -38,11 +37,6 @@ class User(TokenModel):
     def __repr__(self) -> str:
         """Human-readable representation string"""
         return "<{} {}>".format(self.__class__.__name__, self.email)
-
-    @classmethod
-    def current_user(cls):
-        tokeninfo = flaat.current_tokeninfo()
-        return cls.read((tokeninfo['sub'], tokeninfo['iss']))
 
 
 class HasUploader(object):
