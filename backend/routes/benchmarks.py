@@ -6,7 +6,7 @@ from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 
 from .. import models, notifications, utils
-from ..extensions import auth, db
+from ..extensions import db, flaat
 from ..schemas import args, schemas
 from ..utils import queries
 
@@ -50,7 +50,7 @@ def __list(query_args):
 
 @blp.route(collection_url, methods=["POST"])
 @blp.doc(operationId='CreateBenchmark')
-@auth.login_required()
+@flaat.login_required()
 @blp.arguments(schemas.CreateBenchmark)
 @blp.response(201, schemas.Benchmark)
 def create(*args, **kwargs):
@@ -174,7 +174,7 @@ def __get(benchmark_id):
 
 @blp.route(resource_url, methods=["PUT"])
 @blp.doc(operationId='UpdateBenchmark')
-@auth.admin_required()
+@flaat.admin_required()
 @blp.arguments(schemas.Benchmark)
 @blp.response(204)
 def update(*args, **kwargs):
@@ -217,7 +217,7 @@ def __update(body_args, benchmark_id):
 
 @blp.route(resource_url, methods=["DELETE"])
 @blp.doc(operationId='DeleteBenchmark')
-@auth.admin_required()
+@flaat.admin_required()
 @blp.arguments(args.Schema(), location='query', as_kwargs=True)
 @blp.response(204)
 def delete(*args, **kwargs):
@@ -252,7 +252,7 @@ def __delete(benchmark_id):
 
 @blp.route(resource_url + ":approve", methods=["POST"])
 @blp.doc(operationId='ApproveBenchmark')
-@auth.admin_required()
+@flaat.admin_required()
 @blp.arguments(args.Schema(), location='query', as_kwargs=True)
 @blp.response(204)
 def approve(*args, **kwargs):
@@ -293,7 +293,7 @@ def __approve(benchmark_id):
 
 @blp.route(resource_url + ":reject", methods=["POST"])
 @blp.doc(operationId='RejectBenchmark')
-@auth.admin_required()
+@flaat.admin_required()
 @blp.arguments(args.Schema(), location='query', as_kwargs=True)
 @blp.response(204)
 def reject(*args, **kwargs):

@@ -6,7 +6,7 @@ from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 
 from .. import models
-from ..extensions import auth, db
+from ..extensions import db, flaat
 from ..schemas import args, schemas
 from ..utils import queries
 
@@ -49,7 +49,7 @@ def __list(query_args):
 
 @blp.route(collection_url, methods=["POST"])
 @blp.doc(operationId='CreateTag')
-@auth.login_required()
+@flaat.login_required()
 @blp.arguments(schemas.CreateTag)
 @blp.response(201, schemas.Tag)
 def create(*args, **kwargs):
@@ -155,7 +155,7 @@ def __get(tag_id):
 
 @blp.route(resource_url, methods=["PUT"])
 @blp.doc(operationId='UpdateTag')
-@auth.admin_required()
+@flaat.admin_required()
 @blp.arguments(schemas.Tag)
 @blp.response(204)
 def update(*args, **kwargs):
@@ -193,7 +193,7 @@ def __update(body_args, tag_id):
 
 @blp.route(resource_url, methods=["DELETE"])
 @blp.doc(operationId='DeleteTag')
-@auth.admin_required()
+@flaat.admin_required()
 @blp.response(204)
 def delete(*args, **kwargs):
     """(Admins) Deletes an existing tag

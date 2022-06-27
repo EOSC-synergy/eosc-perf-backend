@@ -6,7 +6,7 @@ from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 
 from .. import models, notifications
-from ..extensions import auth, db
+from ..extensions import db, flaat
 from ..schemas import args, schemas
 from ..utils import queries
 
@@ -49,7 +49,7 @@ def __list(query_args):
 
 
 @blp.route(collection_url, methods=['POST'])
-@auth.login_required()
+@flaat.login_required()
 @blp.doc(operationId='CreateSite')
 @blp.arguments(schemas.CreateSite)
 @blp.response(201, schemas.Site)
@@ -158,7 +158,7 @@ def __get(site_id):
 
 
 @blp.route(resource_url, methods=['PUT'])
-@auth.admin_required()
+@flaat.admin_required()
 @blp.doc(operationId='UpdateSite')
 @blp.arguments(schemas.Site)
 @blp.response(204)
@@ -196,7 +196,7 @@ def __update(body_args, site_id):
 
 
 @blp.route(resource_url, methods=['DELETE'])
-@auth.admin_required()
+@flaat.admin_required()
 @blp.doc(operationId='DeleteSite')
 @blp.response(204)
 def delete(*args, **kwargs):
@@ -230,7 +230,7 @@ def __delete(site_id):
 
 
 @blp.route(resource_url + ":approve", methods=["POST"])
-@auth.admin_required()
+@flaat.admin_required()
 @blp.doc(operationId='ApproveSite')
 @blp.response(204)
 def approve(*args, **kwargs):
@@ -271,7 +271,7 @@ def __approve(site_id):
 
 @blp.route(resource_url + ":reject", methods=["POST"])
 @blp.doc(operationId='RejectSite')
-@auth.admin_required()
+@flaat.admin_required()
 @blp.response(204)
 def reject(*args, **kwargs):
     """(Admins) Rejects a site to safe delete it.
@@ -347,7 +347,7 @@ def __list_flavors(query_args, site_id):
 
 
 @blp.route(resource_url + '/flavors', methods=['POST'])
-@auth.login_required()
+@flaat.login_required()
 @blp.doc(operationId='AddFlavor')
 @blp.arguments(schemas.CreateFlavor)
 @blp.response(201, schemas.Flavor)

@@ -5,7 +5,7 @@ from sqlalchemy import Column, DateTime, Text
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import backref, relationship
 
-from ...extensions import auth
+from ...extensions import flaat
 from ..core import TokenModel
 
 
@@ -41,7 +41,7 @@ class User(TokenModel):
 
     @classmethod
     def current_user(cls):
-        tokeninfo = auth.current_tokeninfo()
+        tokeninfo = flaat.current_tokeninfo()
         return cls.read((tokeninfo['sub'], tokeninfo['iss']))
 
 

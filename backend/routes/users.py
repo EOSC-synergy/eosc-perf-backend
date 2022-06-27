@@ -5,7 +5,7 @@ from flask_smorest import Blueprint, abort
 from sqlalchemy.exc import IntegrityError
 
 from .. import models, notifications
-from ..extensions import auth, db
+from ..extensions import db, flaat
 from ..schemas import args, schemas
 from ..utils import queries
 from . import results as results_routes
@@ -21,7 +21,7 @@ resource_url = "/self"
 
 @blp.route(collection_url, methods=["GET"])
 @blp.doc(operationId='ListUsers')
-@auth.admin_required()
+@flaat.admin_required()
 @blp.arguments(args.UserFilter, location='query')
 @blp.response(200, schemas.Users)
 @queries.to_pagination()
@@ -54,7 +54,7 @@ def __list(query_args):
 
 @blp.route(collection_url + ':register', methods=["POST"])
 @blp.doc(operationId='RegisterSelf')
-@auth.token_required()
+@flaat.token_required()
 @blp.response(201, schemas.User)
 def register(*args, **kwargs):
     """(OIDC Token) Registers the logged in user
@@ -75,8 +75,8 @@ def __register():
     :raises Unauthorized: The server could not verify your identity
     :raises Forbidden: You are not registered
     """
-    tokeninfo = auth.current_tokeninfo()
-    user_info = auth.current_userinfo()
+    tokeninfo = flaat.current_tokeninfo()
+    user_info = flaat.current_userinfo()
     if not user_info:
         error_msg = "No user info received from 'OP endpoint'"
         abort(500, messages={'error': error_msg})
@@ -99,7 +99,7 @@ def __register():
 
 @blp.route(collection_url + ':remove', methods=["POST"])
 @blp.doc(operationId='RemoveUsers')
-@auth.admin_required()
+@flaat.admin_required()
 @blp.arguments(args.UserDelete, location='query')
 @blp.response(204)
 def remove(*args, **kwargs):
@@ -139,7 +139,7 @@ def __remove(query_args):
 
 @blp.route(collection_url + ':search', methods=["GET"])
 @blp.doc(operationId='SearchUsers')
-@auth.admin_required()
+@flaat.admin_required()
 @blp.arguments(args.UserSearch, location='query')
 @blp.response(200, schemas.Users)
 @queries.to_pagination()
@@ -178,7 +178,7 @@ def __search(query_args):
 
 @blp.route(resource_url, methods=["GET"])
 @blp.doc(operationId='GetSelf')
-@auth.login_required()
+@flaat.login_required()
 @blp.response(200, schemas.User)
 def get(*args, **kwargs):
     """(Users) Retrieves the logged in user info
@@ -206,7 +206,7 @@ def __get():
 
 @blp.route(resource_url + ':update', methods=["POST"])
 @blp.doc(operationId='UpdateSelf')
-@auth.login_required()
+@flaat.login_required()
 @blp.response(204)
 def update(*args, **kwargs):
     """(Users) Updates the logged in user info
@@ -225,7 +225,7 @@ def __update():
     :raises Forbidden: You are not registered
     """
     user = __get()
-    user_info = auth.current_userinfo()
+    user_info = flaat.current_userinfo()
     if not user_info:
         error_msg = "No user info received from 'introspection endpoint'"
         abort(500, messages={'error': error_msg})
@@ -245,7 +245,7 @@ def __update():
 
 @blp.route(resource_url + ":try_admin", methods=["GET"])
 @blp.doc(operationId='TryAdmin')
-@auth.admin_required()
+@flaat.admin_required()
 @blp.response(204)
 def try_admin():
     """(Admins) Returns 204 if you are admin
@@ -262,7 +262,7 @@ def try_admin():
 
 @blp.route(resource_url + "/results", methods=["GET"])
 @blp.doc(operationId='ListUserResults')
-@auth.login_required()
+@flaat.login_required()
 @blp.arguments(args.ResultFilter, location='query')
 @blp.response(200, schemas.Results)
 @queries.to_pagination()
@@ -291,7 +291,7 @@ def __results(query_args):
 
 @blp.route(resource_url + "/claims", methods=["GET"])
 @blp.doc(operationId='ListUserClaims')
-@auth.login_required()
+@flaat.login_required()
 @blp.arguments(args.ClaimFilter, location='query')
 @blp.response(200, schemas.Claims)
 @queries.to_pagination()

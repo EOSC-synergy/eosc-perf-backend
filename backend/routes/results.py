@@ -9,7 +9,7 @@ from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError
 
 from .. import models, notifications
-from ..extensions import auth, db
+from ..extensions import db, flaat
 from ..schemas import args, schemas
 from ..utils import filters, queries
 
@@ -116,7 +116,7 @@ def __list(query_args):
 
 @blp.route(collection_url, methods=["POST"])
 @blp.doc(operationId='CreateResult')
-@auth.login_required()
+@flaat.login_required()
 @blp.arguments(args.ResultContext, location='query')
 @blp.arguments(schemas.Json)
 @blp.response(201, schemas.Result)
@@ -262,7 +262,7 @@ def __get(result_id):
 
 @blp.route(resource_url, methods=["DELETE"])
 @blp.doc(operationId='DeleteResult')
-@auth.admin_required()
+@flaat.admin_required()
 @blp.response(204)
 def delete(*args, **kwargs):
     """(Admin) Deletes an existing result
@@ -296,7 +296,7 @@ def __delete(result_id):
 
 @blp.route(resource_url + ":claim", methods=["POST"])
 @blp.doc(operationId='ClaimReport')
-@auth.login_required()
+@flaat.login_required()
 @blp.arguments(schemas.CreateClaim)
 @blp.response(201, schemas.Claim)
 def claim(*args, **kwargs):
@@ -338,7 +338,7 @@ def __claim(body_args, result_id):
 
 @blp.route(resource_url + '/tags', methods=["PUT"])
 @blp.doc(operationId='UpdateResult')
-@auth.login_required()
+@flaat.login_required()
 @blp.arguments(schemas.TagsIds)
 @blp.response(204)
 def update_tags(*args, **kwargs):
@@ -371,7 +371,7 @@ def __update_tags(body_args, result_id):
         body_args['tags'] = [models.Tag.read(id) for id in tags_ids]
 
     try:
-        result.update(body_args, force=auth.valid_admin())
+        result.update(body_args, force=flaat.valid_admin())
     except PermissionError:
         abort(403)
 
@@ -384,7 +384,7 @@ def __update_tags(body_args, result_id):
 
 @blp.route(resource_url + "/claims", methods=["GET"])
 @blp.doc(operationId='ListResultClaims')
-@auth.login_required()
+@flaat.login_required()
 @blp.arguments(args.ClaimFilter, location='query')
 @blp.response(200, schemas.Claims)
 @queries.to_pagination()
@@ -410,7 +410,7 @@ def __list_claims(query_args, result_id):
     """
     result = __get(result_id)
 
-    if auth.valid_admin():
+    if flaat.valid_admin():
         pass
     elif models.User.current_user() == result.uploader:
         pass
@@ -423,7 +423,7 @@ def __list_claims(query_args, result_id):
 
 @blp.route(resource_url + "/uploader", methods=["GET"])
 @blp.doc(operationId='ResultUploader')
-@auth.admin_required()
+@flaat.admin_required()
 @blp.response(200, schemas.User)
 def get_uploader(*args, **kwargs):
     """(Admins) Retrieves result uploader

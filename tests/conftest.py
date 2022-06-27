@@ -6,8 +6,8 @@ import os
 
 import factories
 from backend import create_app
-from backend.extensions import auth as authentication
 from backend.extensions import db as database
+from backend.extensions import flaat
 from backend.utils import dockerhub
 from flaat import tokentools
 from pytest import fixture
@@ -118,7 +118,7 @@ def mock_accesstoken(monkeypatch, token_sub, token_iss):
 def mock_endpoints(monkeypatch):
     """Patch fixture to edit information from tokenuser endpoints."""
     monkeypatch.setattr(
-        authentication,
+        flaat,
         "get_info_from_userinfo_endpoints",
         lambda _: {}
     )
@@ -134,7 +134,7 @@ def introspection_email(request):
 def mock_introspection(monkeypatch, introspection_email):
     """Patch function to provide custom introspection information."""
     monkeypatch.setattr(
-        authentication,
+        flaat,
         "get_info_from_introspection_endpoints",
         lambda _: {'email': introspection_email}
     )
@@ -149,13 +149,13 @@ def grant_accesstoken(mock_accesstoken, mock_endpoints, mock_introspection):
 @fixture(scope='function')
 def grant_logged(monkeypatch, grant_accesstoken):
     """Patch fixture to test function as logged user."""
-    monkeypatch.setattr(authentication, "valid_user", lambda: True)
+    monkeypatch.setattr(flaat, "valid_user", lambda: True)
 
 
 @fixture(scope='function')
 def grant_admin(monkeypatch, grant_logged):
     """Patch fixture to test function as admin user."""
-    monkeypatch.setattr(authentication, "valid_admin", lambda: True)
+    monkeypatch.setattr(flaat, "valid_admin", lambda: True)
 
 
 @fixture(scope='function')
