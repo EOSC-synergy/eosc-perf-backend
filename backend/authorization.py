@@ -35,8 +35,8 @@ class Authorization(Flaat):
         self.set_web_framework('flask')
         self.set_trusted_OP_list([
             'https://aai.egi.eu/oidc',
-            'https://aai-demo.egi.eu/oidc',
-            'https://aai-dev.egi.eu/oidc',
+            'https://aai-demo.egi.eu/auth/realms/egi',
+            'https://aai-dev.egi.eu/auth/realms/egi',
         ])
 
         # Flaat timeout:
