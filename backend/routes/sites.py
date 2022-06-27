@@ -49,7 +49,7 @@ def __list(query_args):
 
 
 @blp.route(collection_url, methods=['POST'])
-@flaat.is_authenticated()
+@flaat.access_level("user")
 @blp.doc(operationId='CreateSite')
 @blp.arguments(schemas.CreateSite)
 @blp.response(201, schemas.Site)
@@ -347,7 +347,7 @@ def __list_flavors(query_args, site_id):
 
 
 @blp.route(resource_url + '/flavors', methods=['POST'])
-@flaat.is_authenticated()
+@flaat.access_level("user")
 @blp.doc(operationId='AddFlavor')
 @blp.arguments(schemas.CreateFlavor)
 @blp.response(201, schemas.Flavor)
