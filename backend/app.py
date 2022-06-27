@@ -8,8 +8,6 @@ import marshmallow as ma
 from flask import Flask
 from webargs.flaskparser import FlaskParser
 
-from authorization import access_levels
-
 from . import routes
 from .extensions import api         # Api interface module
 from .extensions import flaat       # Flask authentication with tokens
@@ -86,7 +84,7 @@ def register_extensions(app):
     api.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)
-    flaat.init_app(app, access_levels)
+    flaat.init_app(app)
     mail.init_app(app)
 
 
