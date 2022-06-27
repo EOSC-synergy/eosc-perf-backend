@@ -10,7 +10,7 @@ from webargs.flaskparser import FlaskParser
 
 from . import routes
 from .extensions import api         # Api interface module
-from .extensions import auth        # flaat ext. manage db migrations
+from .extensions import flaat       # Flask authentication with tokens
 from .extensions import db          # SQLAlchemy instance
 from .extensions import migrate     # Alembic ext. manage db migrations
 from .extensions import mail        # Mail ext. to send notifications
@@ -84,7 +84,7 @@ def register_extensions(app):
     api.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)
-    auth.init_app(app)
+    flaat.init_app(app)
     mail.init_app(app)
 
 
