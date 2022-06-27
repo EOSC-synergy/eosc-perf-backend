@@ -14,7 +14,7 @@ from flask_migrate import Migrate
 from flask_smorest import Api
 from flask_sqlalchemy import SQLAlchemy
 
-from authorization import access_levels
+from .authorization import access_levels
 
 
 #: Flask extension that provides support for handling oidc Access Tokens
