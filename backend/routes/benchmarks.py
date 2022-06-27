@@ -174,7 +174,7 @@ def __get(benchmark_id):
 
 @blp.route(resource_url, methods=["PUT"])
 @blp.doc(operationId='UpdateBenchmark')
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.arguments(schemas.Benchmark)
 @blp.response(204)
 def update(*args, **kwargs):
@@ -217,7 +217,7 @@ def __update(body_args, benchmark_id):
 
 @blp.route(resource_url, methods=["DELETE"])
 @blp.doc(operationId='DeleteBenchmark')
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.arguments(args.Schema(), location='query', as_kwargs=True)
 @blp.response(204)
 def delete(*args, **kwargs):
@@ -252,7 +252,7 @@ def __delete(benchmark_id):
 
 @blp.route(resource_url + ":approve", methods=["POST"])
 @blp.doc(operationId='ApproveBenchmark')
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.arguments(args.Schema(), location='query', as_kwargs=True)
 @blp.response(204)
 def approve(*args, **kwargs):
@@ -293,7 +293,7 @@ def __approve(benchmark_id):
 
 @blp.route(resource_url + ":reject", methods=["POST"])
 @blp.doc(operationId='RejectBenchmark')
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.arguments(args.Schema(), location='query', as_kwargs=True)
 @blp.response(204)
 def reject(*args, **kwargs):

@@ -158,7 +158,7 @@ def __get(site_id):
 
 
 @blp.route(resource_url, methods=['PUT'])
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.doc(operationId='UpdateSite')
 @blp.arguments(schemas.Site)
 @blp.response(204)
@@ -196,7 +196,7 @@ def __update(body_args, site_id):
 
 
 @blp.route(resource_url, methods=['DELETE'])
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.doc(operationId='DeleteSite')
 @blp.response(204)
 def delete(*args, **kwargs):
@@ -230,7 +230,7 @@ def __delete(site_id):
 
 
 @blp.route(resource_url + ":approve", methods=["POST"])
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.doc(operationId='ApproveSite')
 @blp.response(204)
 def approve(*args, **kwargs):
@@ -271,7 +271,7 @@ def __approve(site_id):
 
 @blp.route(resource_url + ":reject", methods=["POST"])
 @blp.doc(operationId='RejectSite')
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.response(204)
 def reject(*args, **kwargs):
     """(Admins) Rejects a site to safe delete it.

@@ -19,7 +19,7 @@ result_claim_url = result_claims_url + '/<uuid:report_id>'
 
 
 @blp.route(submits_url, methods=['GET'])
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.doc(operationId='ListSubmits')
 @blp.arguments(args.SubmitFilter, location='query')
 @blp.response(200, schemas.Submits)
@@ -53,7 +53,7 @@ def __list_submits(query_args):
 
 @blp.route(result_claims_url, methods=['GET'])
 @blp.doc(operationId='ListClaims')
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.arguments(args.ClaimFilter, location='query')
 @blp.response(200, schemas.Claims)
 @queries.to_pagination()
@@ -86,7 +86,7 @@ def __list_claims(query_args):
 
 @blp.route(result_claim_url, methods=['GET'])
 @blp.doc(operationId='GetClaim')
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.response(200, schemas.Claim)
 def get(*args, **kwargs):
     """(Public) Retrieves claim details
@@ -118,7 +118,7 @@ def __get(report_id):
 
 @blp.route(result_claim_url + ':approve', methods=['POST'])
 @blp.doc(operationId='ApproveClaim')
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.arguments(args.Schema(), location='query', as_kwargs=True)
 @blp.response(204)
 def approve_claim(*args, **kwargs):
@@ -166,7 +166,7 @@ def __approve_claim(report_id):
 
 @blp.route(result_claim_url + ':reject', methods=['POST'])
 @blp.doc(operationId='RejectClaim')
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.arguments(args.Schema(), location='query', as_kwargs=True)
 @blp.response(204)
 def reject_claim(*args, **kwargs):

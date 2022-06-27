@@ -49,7 +49,7 @@ def __get(flavor_id):
 
 @blp.route(resource_url, methods=["PUT"])
 @blp.doc(operationId='UpdateFlavor')
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.arguments(schemas.Flavor)
 @blp.response(204)
 def update(*args, **kwargs):
@@ -91,7 +91,7 @@ def __update(body_args, flavor_id):
 
 @blp.route(resource_url, methods=["DELETE"])
 @blp.doc(operationId='DeleteFlavor')
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.response(204)
 def delete(*args, **kwargs):
     """(Admins) Deletes an existing flavor
@@ -129,7 +129,7 @@ def __delete(flavor_id):
 
 @blp.route(resource_url + ":approve", methods=["POST"])
 @blp.doc(operationId='ApproveFlavor')
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.response(204)
 def approve(*args, **kwargs):
     """(Admins) Approves a flavor to include it on default list methods
@@ -169,7 +169,7 @@ def __approve(flavor_id):
 
 @blp.route(resource_url + ":reject", methods=["POST"])
 @blp.doc(operationId='RejectFlavor')
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.response(204)
 def reject(*args, **kwargs):
     """(Admins) Rejects a flavor to safe delete it.

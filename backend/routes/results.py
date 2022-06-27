@@ -262,7 +262,7 @@ def __get(result_id):
 
 @blp.route(resource_url, methods=["DELETE"])
 @blp.doc(operationId='DeleteResult')
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.response(204)
 def delete(*args, **kwargs):
     """(Admin) Deletes an existing result
@@ -423,7 +423,7 @@ def __list_claims(query_args, result_id):
 
 @blp.route(resource_url + "/uploader", methods=["GET"])
 @blp.doc(operationId='ResultUploader')
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.response(200, schemas.User)
 def get_uploader(*args, **kwargs):
     """(Admins) Retrieves result uploader

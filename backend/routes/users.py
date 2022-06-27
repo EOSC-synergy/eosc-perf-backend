@@ -21,7 +21,7 @@ resource_url = "/self"
 
 @blp.route(collection_url, methods=["GET"])
 @blp.doc(operationId='ListUsers')
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.arguments(args.UserFilter, location='query')
 @blp.response(200, schemas.Users)
 @queries.to_pagination()
@@ -99,7 +99,7 @@ def __register():
 
 @blp.route(collection_url + ':remove', methods=["POST"])
 @blp.doc(operationId='RemoveUsers')
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.arguments(args.UserDelete, location='query')
 @blp.response(204)
 def remove(*args, **kwargs):
@@ -139,7 +139,7 @@ def __remove(query_args):
 
 @blp.route(collection_url + ':search', methods=["GET"])
 @blp.doc(operationId='SearchUsers')
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.arguments(args.UserSearch, location='query')
 @blp.response(200, schemas.Users)
 @queries.to_pagination()
@@ -245,7 +245,7 @@ def __update():
 
 @blp.route(resource_url + ":try_admin", methods=["GET"])
 @blp.doc(operationId='TryAdmin')
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.response(204)
 def try_admin():
     """(Admins) Returns 204 if you are admin

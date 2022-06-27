@@ -155,7 +155,7 @@ def __get(tag_id):
 
 @blp.route(resource_url, methods=["PUT"])
 @blp.doc(operationId='UpdateTag')
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.arguments(schemas.Tag)
 @blp.response(204)
 def update(*args, **kwargs):
@@ -193,7 +193,7 @@ def __update(body_args, tag_id):
 
 @blp.route(resource_url, methods=["DELETE"])
 @blp.doc(operationId='DeleteTag')
-@flaat.admin_required()
+@flaat.access_level("admin")
 @blp.response(204)
 def delete(*args, **kwargs):
     """(Admins) Deletes an existing tag
