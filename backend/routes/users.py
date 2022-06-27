@@ -178,7 +178,7 @@ def __search(query_args):
 
 @blp.route(resource_url, methods=["GET"])
 @blp.doc(operationId='GetSelf')
-@flaat.login_required()
+@flaat.is_authenticated()
 @blp.response(200, schemas.User)
 def get(*args, **kwargs):
     """(Users) Retrieves the logged in user info
@@ -206,7 +206,7 @@ def __get():
 
 @blp.route(resource_url + ':update', methods=["POST"])
 @blp.doc(operationId='UpdateSelf')
-@flaat.login_required()
+@flaat.is_authenticated()
 @blp.response(204)
 def update(*args, **kwargs):
     """(Users) Updates the logged in user info
@@ -262,7 +262,7 @@ def try_admin():
 
 @blp.route(resource_url + "/results", methods=["GET"])
 @blp.doc(operationId='ListUserResults')
-@flaat.login_required()
+@flaat.is_authenticated()
 @blp.arguments(args.ResultFilter, location='query')
 @blp.response(200, schemas.Results)
 @queries.to_pagination()
@@ -291,7 +291,7 @@ def __results(query_args):
 
 @blp.route(resource_url + "/claims", methods=["GET"])
 @blp.doc(operationId='ListUserClaims')
-@flaat.login_required()
+@flaat.is_authenticated()
 @blp.arguments(args.ClaimFilter, location='query')
 @blp.response(200, schemas.Claims)
 @queries.to_pagination()

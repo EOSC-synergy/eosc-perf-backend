@@ -116,7 +116,7 @@ def __list(query_args):
 
 @blp.route(collection_url, methods=["POST"])
 @blp.doc(operationId='CreateResult')
-@flaat.login_required()
+@flaat.is_authenticated()
 @blp.arguments(args.ResultContext, location='query')
 @blp.arguments(schemas.Json)
 @blp.response(201, schemas.Result)
@@ -296,7 +296,7 @@ def __delete(result_id):
 
 @blp.route(resource_url + ":claim", methods=["POST"])
 @blp.doc(operationId='ClaimReport')
-@flaat.login_required()
+@flaat.is_authenticated()
 @blp.arguments(schemas.CreateClaim)
 @blp.response(201, schemas.Claim)
 def claim(*args, **kwargs):
@@ -338,7 +338,7 @@ def __claim(body_args, result_id):
 
 @blp.route(resource_url + '/tags', methods=["PUT"])
 @blp.doc(operationId='UpdateResult')
-@flaat.login_required()
+@flaat.is_authenticated()
 @blp.arguments(schemas.TagsIds)
 @blp.response(204)
 def update_tags(*args, **kwargs):
@@ -384,7 +384,7 @@ def __update_tags(body_args, result_id):
 
 @blp.route(resource_url + "/claims", methods=["GET"])
 @blp.doc(operationId='ListResultClaims')
-@flaat.login_required()
+@flaat.is_authenticated()
 @blp.arguments(args.ClaimFilter, location='query')
 @blp.response(200, schemas.Claims)
 @queries.to_pagination()

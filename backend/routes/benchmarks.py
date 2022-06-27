@@ -50,7 +50,7 @@ def __list(query_args):
 
 @blp.route(collection_url, methods=["POST"])
 @blp.doc(operationId='CreateBenchmark')
-@flaat.login_required()
+@flaat.is_authenticated()
 @blp.arguments(schemas.CreateBenchmark)
 @blp.response(201, schemas.Benchmark)
 def create(*args, **kwargs):
