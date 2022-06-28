@@ -7,13 +7,13 @@ from backend import models
 
 def is_registered(user_infos):
     """Assert user is registered in the database."""
-    models.User.read((user_infos.subject, user_infos.issuer))
-    return
+    user = models.User.read((user_infos.subject, user_infos.issuer))
+    return user != None
 
 
 def is_admin(user_infos):
     """Assert registration and entitlements."""
-    entitlements = set(user_infos.user_infos['eduperson_entitlement'])
+    entitlements = set(user_infos.user_info['eduperson_entitlement'])
     return all([
         entitlements & set(current_app.config['ADMIN_ENTITLEMENTS']),
         is_registered(user_infos),
