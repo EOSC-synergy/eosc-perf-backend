@@ -54,9 +54,9 @@ def __list(query_args):
 
 @blp.route(collection_url + ':register', methods=["POST"])
 @blp.doc(operationId='RegisterSelf')
-@flaat.token_required()
+@flaat.inject_user_infos()
 @blp.response(201, schemas.User)
-def register(*args, **kwargs):
+def register(user_infos, *args, **kwargs):
     """(OIDC Token) Registers the logged in user
 
     Use this method to register yourself into the application. By using
@@ -66,25 +66,20 @@ def register(*args, **kwargs):
 
     The method will return your stored information.
     """
-    return __register(*args, **kwargs)
+    return __register(user_infos, *args, **kwargs)
 
 
-def __register():
+def __register(user_infos):
     """Registers the current request user.
 
     :raises Unauthorized: The server could not verify your identity
     :raises Forbidden: You are not registered
     """
-    tokeninfo = flaat.current_tokeninfo()
-    user_info = flaat.current_userinfo()
-    if not user_info:
-        error_msg = "No user info received from 'OP endpoint'"
-        abort(500, messages={'error': error_msg})
-    elif 'email' not in user_info:
+    if 'email' not in user_infos.user_info:
         abort(422, messages={'error': "No scope for email in oidc token"})
 
-    user_properties = {k: tokeninfo[k] for k in ['iss', 'sub']}
-    user_properties['email'] = user_info['email']
+    user_properties = {k: user_infos.user_info[k] for k in ['iss', 'sub']}
+    user_properties['email'] = user_infos.user_info['email']
     user = models.User.create(user_properties)
 
     try:  # Transaction execution
