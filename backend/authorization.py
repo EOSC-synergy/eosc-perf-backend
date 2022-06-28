@@ -2,7 +2,7 @@ from flaat.config import AccessLevel
 from flaat.requirements import IsTrue
 from flask import current_app
 
-import models
+from backend import models
 
 
 def is_registered(user_infos):
