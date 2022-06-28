@@ -52,6 +52,7 @@ def development_defaults(func):
 bool = development_defaults(env.bool)
 int = development_defaults(env.int)
 str = development_defaults(env.str)
+list = development_defaults(env.list)
 
 
 # Secret key for security and cookie encryption
@@ -140,6 +141,19 @@ BCRYPT_LOG_ROUNDS = int("BCRYPT_LOG_ROUNDS", default=12)
 
 
 # Authorization configuration.
+TRUSTED_OP_LIST = list("TRUSTED_OP_LIST", default=[
+    'https://aai.egi.eu/oidc',
+    'https://aai-demo.egi.eu/auth/realms/egi',
+    'https://aai-dev.egi.eu/auth/realms/egi',
+])
+"""| Trusted OIDC Providers, default value stands for:
+|  - 'https://aai.egi.eu/oidc'
+|  - 'https://aai-demo.egi.eu/auth/realms/egi'
+|  - 'https://aai-dev.egi.eu/auth/realms/egi'
+
+:meta hide-value:
+"""
+
 OIDC_CLIENT_ID = str("OIDC_CLIENT_ID", dev_default="not-defined")
 """| OIDC Client Identifier valid at the Authorization Server.
 | See https://openid.net/specs/openid-connect-core-1_0.html
@@ -173,7 +187,7 @@ if OIDC_CLIENT_SECRET_FILE:
 if not OIDC_CLIENT_SECRET:
     raise EnvError("Environment variable 'OIDC_CLIENT_SECRET' empty")
 
-ADMIN_ENTITLEMENTS = str("ADMIN_ENTITLEMENTS", default="")
+ADMIN_ENTITLEMENTS = list("ADMIN_ENTITLEMENTS", default=[])
 """| OIDC Entitlements to grant administrator rights to users.
 | By default no entitlements are defined to grant administrator rights,
   default=[].
@@ -184,7 +198,7 @@ ADMIN_ENTITLEMENTS = str("ADMIN_ENTITLEMENTS", default="")
 DISABLE_ADMIN_PROTECTION = bool(
     "DISABLE_ADMIN_PROTECTION", default=False, dev_default=True
 )
-"""| Administrator methods can be acceed by any user.
+"""| Administrator methods can be access by any user.
 | **Warning**: Users information is collected using OIDC.
 | OIDC configuration is still needed in order to create new valid users.
 
