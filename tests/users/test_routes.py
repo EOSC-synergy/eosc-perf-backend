@@ -63,7 +63,7 @@ class TestList:
 @mark.parametrize('endpoint', ['users.register'], indirect=True)
 class TestRegister:
 
-    @mark.parametrize('token_sub', ["non-registered"], indirect=True)
+    @mark.parametrize('token_sub', ["no-registered"], indirect=True)
     @mark.parametrize('token_iss', [users[0]['iss']], indirect=True)
     @mark.parametrize('user_email', ["user@email.com"], indirect=True)
     def test_201(self, response_POST, user, url):
@@ -212,7 +212,7 @@ class TestGet:
         """GET method fails 401 if not logged in."""
         assert response_GET.status_code == 401
 
-    @mark.parametrize('token_sub', ["non-registered"], indirect=True)
+    @mark.parametrize('token_sub', ["no-registered"], indirect=True)
     @mark.parametrize('token_iss', [users[0]['iss']], indirect=True)
     def test_404(self, response_GET):
         """GET method fails 404 if not registered."""
@@ -237,7 +237,7 @@ class TestUpdate:
         assert response_POST.status_code == 401
         assert user == models.User.query.get((token_sub, token_iss))
 
-    @mark.parametrize('token_sub', ["non-registered"], indirect=True)
+    @mark.parametrize('token_sub', ["no-registered"], indirect=True)
     @mark.parametrize('token_iss', [users[0]['iss']], indirect=True)
     def test_403(self, response_POST):
         """POST method fails 403 if not registered."""
@@ -308,7 +308,7 @@ class TestResults:
         """GET method fails 401 if not logged in."""
         assert response_GET.status_code == 401
 
-    @mark.parametrize('token_sub', ["non-registered"], indirect=True)
+    @mark.parametrize('token_sub', ["no-registered"], indirect=True)
     @mark.parametrize('token_iss', [users[0]['iss']], indirect=True)
     def test_403(self, response_GET):
         """GET method fails 403 if not registered."""

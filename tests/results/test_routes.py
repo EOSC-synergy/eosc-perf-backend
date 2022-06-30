@@ -99,7 +99,7 @@ class TestCreate:
         """POST method fails 401 if not authorized."""
         assert response_POST.status_code == 401
 
-    @mark.parametrize("token_sub", ["non-registered"], indirect=True)
+    @mark.parametrize("token_sub", ["no-registered"], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize("query", indirect=True, argvalues=[
         post_query,  # Resource can have multiple results
@@ -282,7 +282,7 @@ class TestClaim:
         """POST method fails 401 if not authorized."""
         assert response_POST.status_code == 401
 
-    @mark.parametrize("token_sub", ["non-registered"], indirect=True)
+    @mark.parametrize("token_sub", ["no-registered"], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize("body", indirect=True, argvalues=[
         {"message": "This is an example report"},

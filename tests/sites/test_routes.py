@@ -72,7 +72,7 @@ class TestCreate:
         """POST method fails 401 if not authorized."""
         assert response_POST.status_code == 401
 
-    @mark.parametrize("token_sub", ["non-registered"], indirect=True)
+    @mark.parametrize("token_sub", ["no-registered"], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize("body", indirect=True, argvalues=[
         {"name": "s3", "address": "addr2", "description": "Text"},
@@ -182,7 +182,7 @@ class TestUpdate:
         assert response_PUT.status_code == 401
         assert site == models.Site.query.get(site.id)
 
-    @mark.parametrize("token_sub", ["non-registered"], indirect=True)
+    @mark.parametrize("token_sub", ["no-registered"], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize("body", indirect=True, argvalues=[
         {"name": "new_name", "address": "new_addr"},
@@ -399,7 +399,7 @@ class TestCreateFlavor:
         """POST method fails 401 if not authorized."""
         assert response_POST.status_code == 401
 
-    @mark.parametrize("token_sub", ["non-registered"], indirect=True)
+    @mark.parametrize("token_sub", ["no-registered"], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize("body", indirect=True, argvalues=[
         {"name": "flavorN", "description": "FlavorN for siteX"},
