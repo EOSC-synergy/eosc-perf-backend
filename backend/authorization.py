@@ -8,7 +8,7 @@ from backend import models
 def is_registered(user_infos):
     """Assert user is registered in the database."""
     user = models.User.read((user_infos.subject, user_infos.issuer))
-    return user != None
+    return user is not None
 
 
 def is_admin(user_infos):

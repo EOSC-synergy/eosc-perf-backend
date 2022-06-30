@@ -301,7 +301,6 @@ class TestResults:
             assert not result.deleted
             assert result.uploader == user
 
-
     @mark.parametrize('token_sub', [None], indirect=True)
     @mark.parametrize('token_iss', [None], indirect=True)
     def test_401(self, response_GET):

@@ -110,7 +110,7 @@ class HasClaims(SoftDelete):
         deletes the resource.
 
         :param claimer: Message to include in the claim
-        :type claimer: models.User 
+        :type claimer: models.User
         :param message: Message to include in the claim
         :type message: str
         """

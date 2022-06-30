@@ -182,7 +182,8 @@ class TestUpdate:
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize("body", indirect=True, argvalues=[
-        {"docker_image": "new_name", "docker_tag": "v1.0", "json_schema": {"x": 2}},
+        {"docker_image": "new_name", "docker_tag": "v1.0",
+         "json_schema": {"x": 2}},
     ])
     def test_204(self, body, response_PUT, benchmark):
         """PUT method succeeded 204."""
@@ -213,7 +214,8 @@ class TestUpdate:
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize("request_id", [uuid4()], indirect=True)
     @mark.parametrize("body", indirect=True, argvalues=[
-        {"docker_image": "new_name", "docker_tag": "v1.0", "json_schema": {"x": 2}},
+        {"docker_image": "new_name", "docker_tag": "v1.0",
+         "json_schema": {"x": 2}},
     ])
     def test_404(self, benchmark, response_PUT):
         """PUT method fails 404 if no id found."""
@@ -312,7 +314,7 @@ class TestApprove:
     benchmarks[4]["id"],
 ])
 class TestReject:
-    
+
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)

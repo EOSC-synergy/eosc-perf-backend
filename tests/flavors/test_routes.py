@@ -226,7 +226,7 @@ class TestReject:
     flavors[2]["id"], flavors[3]["id"],
 ])
 class TestSite:
-    
+
     def test_200(self, flavor, response_GET):
         """GET method succeeded 200."""
         assert response_GET.status_code == 200

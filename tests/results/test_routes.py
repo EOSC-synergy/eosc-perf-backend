@@ -488,7 +488,7 @@ class TestListClaims:
     results[1]["id"],
 ])
 class TestGetUploader:
-    
+
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)

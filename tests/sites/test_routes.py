@@ -453,7 +453,7 @@ class TestCreateFlavor:
     sites[0]["id"],
 ])
 class TestSearchFlavors:
-    
+
     @mark.parametrize("query", indirect=True, argvalues=[
         {"terms": [flavors[0]["name"]]},
         {"terms[]": [flavors[0]["name"]]},

@@ -162,11 +162,11 @@ def __create(query_args, body_args, user_infos):
     def get(model, result_id):
         item = model.read(result_id)
         if item is None:
-            error_msg = f"{item.__class__.__name__} {result_id} not in database"
-            abort(404, messages={'error': error_msg})
+            err_msg = f"{item.__class__.__name__} {result_id} not in database"
+            abort(404, messages={'error': err_msg})
         elif hasattr(item, "status") and item.status.name != "approved":
-            error_msg = f"{item.__class__.__name__} {result_id} not approved"
-            abort(422, messages={'error': error_msg})
+            err_msg = f"{item.__class__.__name__} {result_id} not approved"
+            abort(422, messages={'error': err_msg})
         else:
             return item
 
