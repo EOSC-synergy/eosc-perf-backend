@@ -9,6 +9,8 @@ from tests.db_instances import benchmarks, flavors, results, sites, tags, users
 class TestList:
 
     @mark.usefixtures('grant_admin')
+    @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
+    @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize('query', indirect=True, argvalues=[
         {'sub': 'sub_0'},
         {'iss': 'https://aai-dev.egi.eu/oidc'},
@@ -28,6 +30,8 @@ class TestList:
             asserts.match_query(item, url)
             asserts.match_user(item, user)
 
+    @mark.parametrize("token_sub", [None], indirect=True)
+    @mark.parametrize("token_iss", [None], indirect=True)
     @mark.parametrize('query', indirect=True, argvalues=[
         {'email': "sub_0@email.com"}
     ])
@@ -35,7 +39,8 @@ class TestList:
         """GET method fails 401 if not logged in."""
         assert response_GET.status_code == 401
 
-    @mark.usefixtures('grant_logged')
+    @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
+    @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize('query', indirect=True, argvalues=[
         {'email': "sub_0@email.com"}
     ])
@@ -44,6 +49,8 @@ class TestList:
         assert response_GET.status_code == 403
 
     @mark.usefixtures('grant_admin')
+    @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
+    @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize('query', indirect=True, argvalues=[
         {'bad_key': "This is a non expected query key"},
         {'sort_by': "Bad sort command"}
@@ -56,10 +63,9 @@ class TestList:
 @mark.parametrize('endpoint', ['users.register'], indirect=True)
 class TestRegister:
 
-    @mark.usefixtures('grant_accesstoken')
-    @mark.parametrize('token_sub', ["new_user"], indirect=True)
+    @mark.parametrize('token_sub', ["non-registered"], indirect=True)
     @mark.parametrize('token_iss', [users[0]['iss']], indirect=True)
-    @mark.parametrize('introspection_email', ["user@email.com"], indirect=True)
+    @mark.parametrize('user_email', ["user@email.com"], indirect=True)
     def test_201(self, response_POST, user, url):
         """POST method succeeded 201."""
         assert response_POST.status_code == 201
@@ -67,16 +73,15 @@ class TestRegister:
         asserts.match_user(response_POST.json, user)
         asserts.user_welcome(user)
 
-    @mark.usefixtures('mock_introspection')
-    @mark.parametrize('introspection_email', ["user@email.com"], indirect=True)
+    @mark.parametrize('token_sub', [None], indirect=True)
+    @mark.parametrize('token_iss', [None], indirect=True)
     def test_401(self, response_POST):
         """POST method fails 401 if not authorized."""
         assert response_POST.status_code == 401
 
-    @mark.usefixtures('grant_accesstoken')
     @mark.parametrize('token_sub', [users[0]['sub']], indirect=True)
     @mark.parametrize('token_iss', [users[0]['iss']], indirect=True)
-    @mark.parametrize('introspection_email', ["user@email.com"], indirect=True)
+    @mark.parametrize('user_email', ["user@email.com"], indirect=True)
     def test_409(self, response_POST):
         """POST method fails 409 if resource already exists."""
         assert response_POST.status_code == 409
@@ -86,9 +91,11 @@ class TestRegister:
 class TestRemove:
 
     @mark.usefixtures('grant_admin')
+    @mark.parametrize('token_sub', [users[0]['sub']], indirect=True)
+    @mark.parametrize('token_iss', [users[0]['iss']], indirect=True)
     @mark.parametrize('query', indirect=True, argvalues=[
-        {'sub': 'sub_1'},
-        {'email': "sub_1@email.com"}
+        {'sub': users[1]['sub']},
+        {'email': users[1]['email']},
     ])
     def test_204(self, query, response_POST):
         """POST method succeeded 204."""
@@ -100,17 +107,20 @@ class TestRemove:
         assert models.Site.query.get(sites[2]['id']) is None
         assert models.Flavor.query.get(flavors[4]['id']) is None
 
+    @mark.parametrize('token_sub', [None], indirect=True)
+    @mark.parametrize('token_iss', [None], indirect=True)
     @mark.parametrize('query', indirect=True, argvalues=[
-        {'email': "sub_1@email.com"}
+        {'sub': users[1]['sub']},
     ])
     def test_401(self, query, response_POST):
         """POST method fails 401 if not authorized."""
         assert response_POST.status_code == 401
         assert models.User.query.filter_by(**query).all() != []
 
-    @mark.usefixtures('grant_logged')
+    @mark.parametrize('token_sub', [users[0]['sub']], indirect=True)
+    @mark.parametrize('token_iss', [users[0]['iss']], indirect=True)
     @mark.parametrize('query', indirect=True, argvalues=[
-        {'email': "sub_1@email.com"}
+        {'sub': users[1]['sub']},
     ])
     def test_403(self, query, response_POST):
         """POST method fails 403 if forbidden."""
@@ -118,8 +128,10 @@ class TestRemove:
         assert models.User.query.filter_by(**query).all() != []
 
     @mark.usefixtures('grant_admin')
+    @mark.parametrize('token_sub', [users[0]['sub']], indirect=True)
+    @mark.parametrize('token_iss', [users[0]['iss']], indirect=True)
     @mark.parametrize('query', indirect=True, argvalues=[
-        {}  # Attempt to POST all users should be forbiden
+        {}  # Attempt to POST all users should be forbidden
     ])
     def test_422(self, response_POST):
         """POST method fails 422 if bad request body."""
@@ -131,6 +143,8 @@ class TestRemove:
 class TestSearch:
 
     @mark.usefixtures('grant_admin')
+    @mark.parametrize('token_sub', [users[0]['sub']], indirect=True)
+    @mark.parametrize('token_iss', [users[0]['iss']], indirect=True)
     @mark.parametrize('query', indirect=True,  argvalues=[
         {'terms': ["sub_0@email.com"]},
         {'terms[]': ["sub_0@email.com"]},
@@ -152,6 +166,8 @@ class TestSearch:
             asserts.match_query(item, url)
             asserts.match_user(item, user)
 
+    @mark.parametrize('token_sub', [None], indirect=True)
+    @mark.parametrize('token_iss', [None], indirect=True)
     @mark.parametrize('query', indirect=True,  argvalues=[
         {'terms': ["sub_0@email.com"]}
     ])
@@ -159,7 +175,8 @@ class TestSearch:
         """GET method fails 401 if not logged in."""
         assert response_GET.status_code == 401
 
-    @mark.usefixtures('grant_logged')
+    @mark.parametrize('token_sub', [users[0]['sub']], indirect=True)
+    @mark.parametrize('token_iss', [users[0]['iss']], indirect=True)
     @mark.parametrize('query', indirect=True, argvalues=[
         {'terms': ["sub_0@email.com"]}
     ])
@@ -168,6 +185,8 @@ class TestSearch:
         assert response_GET.status_code == 403
 
     @mark.usefixtures('grant_admin')
+    @mark.parametrize('token_sub', [users[0]['sub']], indirect=True)
+    @mark.parametrize('token_iss', [users[0]['iss']], indirect=True)
     @mark.parametrize('query', indirect=True, argvalues=[
         {'bad_key': "This is a non expected query key"},
         {'sort_by': "Bad sort command"}
@@ -180,7 +199,6 @@ class TestSearch:
 @mark.parametrize('endpoint', ['users.get'], indirect=True)
 class TestGet:
 
-    @mark.usefixtures('grant_logged')
     @mark.parametrize('token_sub', [users[0]['sub']], indirect=True)
     @mark.parametrize('token_iss', [users[0]['iss']], indirect=True)
     def test_200(self, user, response_GET):
@@ -188,44 +206,39 @@ class TestGet:
         assert response_GET.status_code == 200
         asserts.match_user(response_GET.json, user)
 
-    @mark.usefixtures('mock_accesstoken')
-    @mark.parametrize('token_sub', [users[0]['sub']], indirect=True)
-    @mark.parametrize('token_iss', [users[0]['iss']], indirect=True)
+    @mark.parametrize('token_sub', [None], indirect=True)
+    @mark.parametrize('token_iss', [None], indirect=True)
     def test_401(self, response_GET):
         """GET method fails 401 if not logged in."""
         assert response_GET.status_code == 401
 
-    @mark.usefixtures('grant_accesstoken')
-    @mark.parametrize('token_sub', ["non_existing"], indirect=True)
+    @mark.parametrize('token_sub', ["non-registered"], indirect=True)
     @mark.parametrize('token_iss', [users[0]['iss']], indirect=True)
-    def test_403(self, response_GET):
-        """GET method fails 403 if not registered."""
-        assert response_GET.status_code == 403
+    def test_404(self, response_GET):
+        """GET method fails 404 if not registered."""
+        assert response_GET.status_code == 404
 
 
 @mark.parametrize('endpoint', ['users.update'], indirect=True)
 class TestUpdate:
 
-    @mark.usefixtures('grant_logged', 'grant_accesstoken')
     @mark.parametrize('token_sub', [users[0]['sub']], indirect=True)
     @mark.parametrize('token_iss', [users[0]['iss']], indirect=True)
-    @mark.parametrize('introspection_email', ["user@email.com"], indirect=True)
-    def test_204(self, introspection_email, response_POST, user):
+    @mark.parametrize('user_email', ["updated@email.com"], indirect=True)
+    def test_204(self, user_email, response_POST, user):
         """POST method succeeded 204."""
         assert response_POST.status_code == 204
-        assert user.email == introspection_email
+        assert user.email == user_email
 
-    @mark.usefixtures('mock_introspection')
-    @mark.parametrize('introspection_email', ["user@email.com"], indirect=True)
+    @mark.parametrize('token_sub', [None], indirect=True)
+    @mark.parametrize('token_iss', [None], indirect=True)
     def test_401(self, token_sub, token_iss, user, response_POST):
         """POST method fails 401 if not authorized."""
         assert response_POST.status_code == 401
         assert user == models.User.query.get((token_sub, token_iss))
 
-    @mark.usefixtures('grant_accesstoken')
-    @mark.parametrize('token_sub', ["not-registered"], indirect=True)
+    @mark.parametrize('token_sub', ["non-registered"], indirect=True)
     @mark.parametrize('token_iss', [users[0]['iss']], indirect=True)
-    @mark.parametrize('introspection_email', ["user@email.com"], indirect=True)
     def test_403(self, response_POST):
         """POST method fails 403 if not registered."""
         assert response_POST.status_code == 403
@@ -236,15 +249,20 @@ class TestAdmin:
     """Tests for 'Admin' route in blueprint."""
 
     @mark.usefixtures('grant_admin')
+    @mark.parametrize('token_sub', [users[0]['sub']], indirect=True)
+    @mark.parametrize('token_iss', [users[0]['iss']], indirect=True)
     def test_204(self, response_GET):
         """GET method succeeded 204."""
         assert response_GET.status_code == 204
 
+    @mark.parametrize('token_sub', [None], indirect=True)
+    @mark.parametrize('token_iss', [None], indirect=True)
     def test_401(self, response_GET):
         """GET method fails 401 if not authorized."""
         assert response_GET.status_code == 401
 
-    @mark.usefixtures('grant_logged')
+    @mark.parametrize('token_sub', [users[0]['sub']], indirect=True)
+    @mark.parametrize('token_iss', [users[0]['iss']], indirect=True)
     def test_403(self, response_GET):
         """GET method fails 403 if forbidden."""
         assert response_GET.status_code == 403
@@ -253,7 +271,6 @@ class TestAdmin:
 @mark.parametrize('endpoint', ['users.results'], indirect=True)
 class TestResults:
 
-    @mark.usefixtures('grant_logged')
     @mark.parametrize('token_sub', [users[0]['sub']], indirect=True)
     @mark.parametrize('token_iss', [users[0]['iss']], indirect=True)
     @mark.parametrize('query', indirect=True, argvalues=[
@@ -284,18 +301,19 @@ class TestResults:
             assert not result.deleted
             assert result.uploader == user
 
+
+    @mark.parametrize('token_sub', [None], indirect=True)
+    @mark.parametrize('token_iss', [None], indirect=True)
     def test_401(self, response_GET):
         """GET method fails 401 if not logged in."""
         assert response_GET.status_code == 401
 
-    @mark.usefixtures('grant_accesstoken')
-    @mark.parametrize('token_sub', ["non_existing"], indirect=True)
+    @mark.parametrize('token_sub', ["non-registered"], indirect=True)
     @mark.parametrize('token_iss', [users[0]['iss']], indirect=True)
     def test_403(self, response_GET):
         """GET method fails 403 if not registered."""
         assert response_GET.status_code == 403
 
-    @mark.usefixtures('grant_logged')
     @mark.parametrize('token_sub', [users[0]['sub']], indirect=True)
     @mark.parametrize('token_iss', [users[0]['iss']], indirect=True)
     @mark.parametrize('query', indirect=True, argvalues=[
@@ -305,7 +323,3 @@ class TestResults:
     def test_422(self, response_GET):
         """GET method fails 422 if bad request body."""
         assert response_GET.status_code == 422
-
-
-# @mark.parametrize('endpoint', ['users.claims'], indirect=True)
-# class TestClaims:
