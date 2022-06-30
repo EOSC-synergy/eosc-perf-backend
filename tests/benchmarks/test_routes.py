@@ -250,9 +250,9 @@ class TestDelete:
 
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
-    def test_403(self, benchmark, response_PUT):
-        """DELETE method fails 403 if method forbidden."""
-        assert response_PUT.status_code == 403
+    def test_403(self, benchmark, response_DELETE):
+        """DELETE method fails 403 if forbidden."""
+        assert response_DELETE.status_code == 403
         assert models.Benchmark.query.get(benchmark.id) is not None
 
     @mark.usefixtures("grant_admin")
