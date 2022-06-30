@@ -80,7 +80,7 @@ def __update(body_args, flavor_id):
         error_msg = f"Record {flavor_id} not found in the database"
         abort(404, messages={'error': error_msg})
 
-    flavor.update(body_args, force=True)  # Only admins reach here
+    flavor.update(body_args)  # Only admins reach here
 
     try:  # Transaction execution
         db.session.commit()

@@ -209,7 +209,7 @@ def __update(body_args, benchmark_id):
         abort(422, messages={'error': error_msg})
 
     benchmark = __get(benchmark_id)
-    benchmark.update(body_args, force=True)  # Only admins reach here
+    benchmark.update(body_args)  # Only admins reach here
 
     try:  # Transaction execution
         db.session.commit()
