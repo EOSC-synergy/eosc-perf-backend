@@ -173,14 +173,14 @@ def __search(query_args):
 
 @blp.route(resource_url, methods=["GET"])
 @blp.doc(operationId='GetSelf')
-@flaat.inject_user_infos() # Fail if no valid authentication is provided
+@flaat.inject_user_infos()  # Fail if no valid authentication is provided
 @blp.response(200, schemas.User)
-def get(user_infos, *args, **kwargs):
+def get(*args, **kwargs):
     """(Users) Retrieves the logged in user info
 
     Use this method to retrieve your user data stored in the database.
     """
-    return __get(user_infos, *args, **kwargs)
+    return __get(*args, **kwargs)
 
 
 def __get(user_infos):
@@ -204,14 +204,14 @@ def __get(user_infos):
 @flaat.access_level("user")
 @flaat.inject_user_infos()
 @blp.response(204)
-def update(user_infos, *args, **kwargs):
+def update(*args, **kwargs):
     """(Users) Updates the logged in user info
 
     Use this method to update your user data in the database. The method
     returns by default 204, use a GET method to retrieve the new status
     of your data.
     """
-    return __update(user_infos, *args, **kwargs)
+    return __update(*args, **kwargs)
 
 
 def __update(user_infos):
@@ -220,12 +220,15 @@ def __update(user_infos):
     :raises Unauthorized: The server could not verify your identity
     :raises Forbidden: You are not registered
     """
-    user = __get()
+    user = __get(user_infos)
     if not user_infos:
-        error_msg = "No user info received from token nor introspection"
-        abort(500, messages={'error': error_msg})
-    elif 'email' not in user_infos:
+        abort(500, messages={'error': "No user information from token"})
+    elif 'email' not in user_infos.user_info:
         abort(422, messages={'error': "No scope for email in oidc token"})
+    elif 'email_verified' not in user_infos.user_info:
+        abort(422, messages={'error': "No email_verified status in user"})
+    elif not user_infos.user_info['email_verified']:
+        abort(422, messages={'error': "Email unverified by OIDC provider"})
 
     user.update({'email': user_infos['email']})
 
@@ -264,17 +267,17 @@ def try_admin():
 @queries.to_pagination()
 @queries.add_sorting(models.Result)
 @queries.add_datefilter(models.Result)
-def results(user_infos, *args, **kwargs):
+def results(*args, **kwargs):
     """(Users) Returns your uploaded results
 
     Use this method to retrieve all the results uploaded by your user.
     You can use the query parameter to retrieve also those with pending
     claims.
     """
-    return __results(user_infos, *args, **kwargs)
+    return __results(*args, **kwargs)
 
 
-def __results(user_infos, query_args):
+def __results(query_args, user_infos):
     """Returns the user uploaded results filtered by the query args.
 
     :raises Unauthorized: The server could not verify your identity
@@ -294,15 +297,15 @@ def __results(user_infos, query_args):
 @queries.to_pagination()
 @queries.add_sorting(models.Claim)
 @queries.add_datefilter(models.Claim)
-def claims(user_infos, *args, **kwargs):
+def claims(*args, **kwargs):
     """(Users) Returns your uploaded pending claims
 
     Use this method to retrieve all the claims uploaded by your user.
     """
-    return __claims(user_infos, *args, **kwargs)
+    return __claims(*args, **kwargs)
 
 
-def __claims(user_infos, query_args):
+def __claims(query_args, user_infos):
     """Returns the user uploaded claims filtered by the query args.
 
     :raises Unauthorized: The server could not verify your identity
