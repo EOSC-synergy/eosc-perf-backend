@@ -54,11 +54,6 @@ class HasUploader(object):
     #: (ISO8601) Upload datetime of the model instance
     upload_datetime = Column(DateTime, nullable=False, default=dt.now)
 
-    def __init__(self, **properties):
-        super().__init__(**properties)
-        if self.uploader is None:
-            self.uploader = User.current_user()
-
     @declared_attr
     def uploader(cls):
         """(User class) User that uploaded the model instance"""
