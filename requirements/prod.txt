@@ -33,3 +33,6 @@ blinker~=1.4.0
 
 # Environment variable parsing
 environs~=9.3.5
+
+# Time control
+pytz~=2022.1
