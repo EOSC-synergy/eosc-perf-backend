@@ -17,19 +17,15 @@ def url(endpoint, request_id, query):
 
 @mark.parametrize("endpoint", ["benchmarks.list"], indirect=True)
 class TestList:
-    @mark.parametrize(
-        "query",
-        indirect=True,
-        argvalues=[
-            {"docker_image": "b1", "docker_tag": "v1.0"},
-            {"docker_image": "b1"},  # Query with 1 field
-            {"docker_tag": "v1.0"},  # Query with 1 field
-            {},  # All results
-            {"sort_by": "+docker_image,+docker_tag"},
-            {"sort_by": "+upload_datetime"},
-            {"sort_by": "+id"},
-        ],
-    )
+    @mark.parametrize("query", indirect=True, argvalues=[
+        {"docker_image": "b1", "docker_tag": "v1.0"},
+        {"docker_image": "b1"},  # Query with 1 field
+        {"docker_tag": "v1.0"},  # Query with 1 field
+        {},  # All results
+        {"sort_by": "+docker_image,+docker_tag"},
+        {"sort_by": "+upload_datetime"},
+        {"sort_by": "+id"},
+    ])
     def test_200(self, response_GET, url):
         """GET method succeeded 200."""
         assert response_GET.status_code == 200
@@ -41,14 +37,10 @@ class TestList:
             asserts.match_benchmark(item, benchmark)
             assert benchmark.status.name == "approved"
 
-    @mark.parametrize(
-        "query",
-        indirect=True,
-        argvalues=[
-            {"bad_key": "This is a non expected query key"},
-            {"sort_by": "Bad sort command"},
-        ],
-    )
+    @mark.parametrize("query", indirect=True, argvalues=[
+        {"bad_key": "This is a non expected query key"},
+        {"sort_by": "Bad sort command"},
+    ])
     def test_422(self, response_GET):
         """GET method fails 422 if bad request body."""
         assert response_GET.status_code == 422
@@ -56,22 +48,14 @@ class TestList:
 
 @mark.parametrize("endpoint", ["benchmarks.create"], indirect=True)
 class TestCreate:
-    @mark.usefixtures("grant_logged", "mock_docker_registry")
+    @mark.usefixtures("mock_docker_registry")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
-    @mark.parametrize(
-        "body",
-        indirect=True,
-        argvalues=[
-            {"docker_image": "b1", "docker_tag": "v2.0", "json_schema": {"x": 1}},
-            {
-                "docker_image": "b2",
-                "docker_tag": "v2.0",
-                "json_schema": {"x": 1},
-                "description": "This is a long benchmark description",
-            },
-        ],
-    )
+    @mark.parametrize("body", indirect=True, argvalues=[
+        {"docker_image": "b1", "docker_tag": "v2.0", "json_schema": {"x": 1}},
+        {"docker_image": "b2", "docker_tag": "v2.0", "json_schema": {"x": 1},
+         "description": "This is a long benchmark description"},
+    ])
     def test_201(self, response_POST, url, body):
         """POST method succeeded 201."""
         assert response_POST.status_code == 201
@@ -81,65 +65,51 @@ class TestCreate:
         asserts.match_benchmark(response_POST.json, benchmark)
         asserts.submit_notification(benchmark.submit_report)
 
-    @mark.parametrize(
-        "body",
-        indirect=True,
-        argvalues=[
-            {"docker_image": "b1", "docker_tag": "v2.0", "json_schema": {"x": 1}},
-            {},  # Empty body
-        ],
-    )
+    @mark.parametrize("token_sub", [None], indirect=True)
+    @mark.parametrize("token_iss", [None], indirect=True)
+    @mark.parametrize("body", indirect=True, argvalues=[
+        {"docker_image": "b1", "docker_tag": "v2.0", "json_schema": {"x": 1}},
+        {},  # Empty body
+    ])
     def test_401(self, response_POST):
         """POST method fails 401 if not authorized."""
         assert response_POST.status_code == 401
 
-    @mark.usefixtures("grant_accesstoken", "mock_docker_registry")
+    @mark.usefixtures("mock_docker_registry")
     @mark.parametrize("token_sub", ["non-registered"], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
-    @mark.parametrize(
-        "body",
-        indirect=True,
-        argvalues=[
-            {"docker_image": "b1", "docker_tag": "v2.0", "json_schema": {"x": 1}}
-        ],
-    )
+    @mark.parametrize("body", indirect=True, argvalues=[
+        {"docker_image": "b1", "docker_tag": "v2.0", "json_schema": {"x": 1}}
+    ])
     def test_403(self, response_POST):
         """POST method fails 403 if user not registered."""
         assert response_POST.status_code == 403
 
-    @mark.usefixtures("grant_logged", "mock_docker_registry")
+    @mark.usefixtures("mock_docker_registry")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
-    @mark.parametrize(
-        "body",
-        indirect=True,
-        argvalues=[
-            {"docker_image": "b1", "docker_tag": "v1.0", "json_schema": {"x": 1}},
-            {"docker_image": "b2", "docker_tag": "v1.0", "json_schema": {"x": 1}},
-        ],
-    )
+    @mark.parametrize("body", indirect=True, argvalues=[
+        {"docker_image": "b1", "docker_tag": "v1.0", "json_schema": {"x": 1}},
+        {"docker_image": "b2", "docker_tag": "v1.0", "json_schema": {"x": 1}},
+    ])
     @mark.filterwarnings("ignore:.*conflicts.*:sqlalchemy.exc.SAWarning")
     def test_409(self, response_POST):
         """POST method fails 409 if resource already exists."""
         assert response_POST.status_code == 409
 
-    @mark.usefixtures("grant_logged", "mock_docker_registry")
+    @mark.usefixtures("mock_docker_registry")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
-    @mark.parametrize(
-        "body",
-        indirect=True,
-        argvalues=[
-            {"docker_image": "_", "docker_tag": "_", "json_schema": {"type": "x"}},
-            {"docker_image": "b1", "docker_tag": "v1.0"},  # Missing json_schema
-            {"docker_image": "b1", "json_schema": {"x": 1}},  # Missing docker_tag
-            {"docker_tag": "v1.0", "json_schema": {"x": 1}},  # Missing docker_im
-            {"docker_image": "b1"},
-            {"docker_tag": "t1"},
-            {"json_schema": {"x": 1}},
-            {},  # Empty body
-        ],
-    )
+    @mark.parametrize("body", indirect=True, argvalues=[
+        {"docker_image": "_", "docker_tag": "_", "json_schema": {"type": "x"}},
+        {"docker_image": "b1", "docker_tag": "v1.0"},  # Missing json_schema
+        {"docker_image": "b1", "json_schema": {"x": 1}},  # Missing docker_tag
+        {"docker_tag": "v1.0", "json_schema": {"x": 1}},  # Missing docker_im
+        {"docker_image": "b1"},
+        {"docker_tag": "t1"},
+        {"json_schema": {"x": 1}},
+        {},  # Empty body
+    ])
     def test_422(self, response_POST):
         """POST method fails 422 if missing required."""
         assert response_POST.status_code == 422
@@ -147,21 +117,17 @@ class TestCreate:
 
 @mark.parametrize("endpoint", ["benchmarks.search"], indirect=True)
 class TestSearch:
-    @mark.parametrize(
-        "query",
-        indirect=True,
-        argvalues=[
-            {"terms": ["b1"]},
-            {"terms[]": ["b1"]},
-            {"terms": ["b1", "v1.0"]},
-            {"terms[]": ["b1", "v1.0"]},
-            {"terms": []},  # Empty query
-            {"terms[]": []},  # Empty query
-            {"sort_by": "+docker_image,+docker_tag"},
-            {"sort_by": "+upload_datetime"},
-            {"sort_by": "+id"},
-        ],
-    )
+    @mark.parametrize("query", indirect=True, argvalues=[
+        {"terms": ["b1"]},
+        {"terms[]": ["b1"]},
+        {"terms": ["b1", "v1.0"]},
+        {"terms[]": ["b1", "v1.0"]},
+        {"terms": []},  # Empty query
+        {"terms[]": []},  # Empty query
+        {"sort_by": "+docker_image,+docker_tag"},
+        {"sort_by": "+upload_datetime"},
+        {"sort_by": "+id"},
+    ])
     def test_200(self, response_GET, url):
         """GET method succeeded 200."""
         assert response_GET.status_code == 200
@@ -173,25 +139,21 @@ class TestSearch:
             asserts.match_benchmark(item, benchmark)
             assert benchmark.status.name == "approved"
 
-    @mark.parametrize(
-        "query",
-        indirect=True,
-        argvalues=[
-            {"bad_key": "This is a non expected query key"},
-            {"sort_by": "Bad sort command"},
-        ],
-    )
+    @mark.parametrize("query", indirect=True, argvalues=[
+        {"bad_key": "This is a non expected query key"},
+        {"sort_by": "Bad sort command"},
+    ])
     def test_422(self, response_GET):
         """GET method fails 422 if bad request body."""
         assert response_GET.status_code == 422
 
 
 @mark.parametrize("endpoint", ["benchmarks.get"], indirect=True)
-@mark.parametrize(
-    "benchmark_id",
-    indirect=True,
-    argvalues=[benchmarks[0]["id"], benchmarks[1]["id"], benchmarks[2]["id"]],
-)
+@mark.parametrize("benchmark_id", indirect=True, argvalues=[
+    benchmarks[0]["id"],
+    benchmarks[1]["id"],
+    benchmarks[2]["id"],
+])
 class TestGet:
     def test_200(self, benchmark, response_GET):
         """GET method succeeded 200."""
@@ -205,48 +167,60 @@ class TestGet:
 
 
 @mark.parametrize("endpoint", ["benchmarks.update"], indirect=True)
-@mark.parametrize(
-    "benchmark_id",
-    indirect=True,
-    argvalues=[benchmarks[0]["id"], benchmarks[1]["id"], benchmarks[2]["id"]],
-)
+@mark.parametrize("benchmark_id", indirect=True, argvalues=[
+    benchmarks[0]["id"],
+    benchmarks[1]["id"],
+    benchmarks[2]["id"],
+])
 class TestUpdate:
     @mark.usefixtures("grant_admin", "mock_docker_registry")
-    @mark.parametrize(
-        "body",
-        indirect=True,
-        argvalues=[
-            {"docker_image": "new_name", "docker_tag": "v1.0", "json_schema": {"x": 2}},
-        ],
-    )
+    @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
+    @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
+    @mark.parametrize("body", indirect=True, argvalues=[
+        {"docker_image": "new_name", "docker_tag": "v1.0", "json_schema": {"x": 2}},
+    ])
     def test_204(self, body, response_PUT, benchmark):
         """PUT method succeeded 204."""
         assert response_PUT.status_code == 204
         json = schemas.Benchmark().dump(benchmark)
         asserts.match_body(json, body)
 
-    @mark.parametrize("body", indirect=True, argvalues=[{"docker_tag": "new_tag"}])
+    @mark.parametrize("body", indirect=True, argvalues=[
+        {"docker_tag": "new_tag"},
+    ])
     def test_401(self, benchmark, response_PUT):
         """PUT method fails 401 if not authorized."""
         assert response_PUT.status_code == 401
         assert benchmark == models.Benchmark.query.get(benchmark.id)
 
+    @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
+    @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
+    @mark.parametrize("body", indirect=True, argvalues=[
+        {"docker_tag": "new_tag"},
+    ])
+    def test_403(self, benchmark, response_PUT):
+        """PUT method fails 403 if no admin."""
+        assert response_PUT.status_code == 403
+        assert benchmark == models.Benchmark.query.get(benchmark.id)
+
     @mark.usefixtures("grant_admin", "mock_docker_registry")
+    @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
+    @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize("request_id", [uuid4()], indirect=True)
-    @mark.parametrize(
-        "body",
-        indirect=True,
-        argvalues=[
-            {"docker_image": "new_name", "docker_tag": "v1.0", "json_schema": {"x": 2}},
-        ],
-    )
+    @mark.parametrize("body", indirect=True, argvalues=[
+        {"docker_image": "new_name", "docker_tag": "v1.0", "json_schema": {"x": 2}},
+    ])
     def test_404(self, benchmark, response_PUT):
         """PUT method fails 404 if no id found."""
         assert response_PUT.status_code == 404
         assert benchmark == models.Benchmark.query.get(benchmark.id)
 
     @mark.usefixtures("grant_admin")
-    @mark.parametrize("body", indirect=True, argvalues=[{"bad_field": ""}])
+    @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
+    @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
+    @mark.parametrize("body", indirect=True, argvalues=[
+        {"bad_field": ""},
+    ])
     def test_422(self, benchmark, response_PUT):
         """PUT method fails 422 if bad request body."""
         assert response_PUT.status_code == 422
@@ -254,13 +228,16 @@ class TestUpdate:
 
 
 @mark.parametrize("endpoint", ["benchmarks.delete"], indirect=True)
-@mark.parametrize(
-    "benchmark_id",
-    indirect=True,
-    argvalues=[benchmarks[0]["id"], benchmarks[1]["id"], benchmarks[2]["id"]],
+@mark.parametrize("benchmark_id", indirect=True, argvalues=[
+    benchmarks[0]["id"],
+    benchmarks[1]["id"],
+    benchmarks[2]["id"],
+]
 )
 class TestDelete:
     @mark.usefixtures("grant_admin")
+    @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
+    @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     def test_204(self, benchmark, response_DELETE):
         """DELETE method succeeded 204."""
         assert response_DELETE.status_code == 204
@@ -271,13 +248,16 @@ class TestDelete:
         assert response_DELETE.status_code == 401
         assert models.Benchmark.query.get(benchmark.id) is not None
 
-    @mark.usefixtures("grant_logged")
+    @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
+    @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     def test_403(self, benchmark, response_PUT):
         """DELETE method fails 403 if method forbidden."""
         assert response_PUT.status_code == 403
         assert models.Benchmark.query.get(benchmark.id) is not None
 
     @mark.usefixtures("grant_admin")
+    @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
+    @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize("request_id", [uuid4()], indirect=True)
     def test_404(self, benchmark, response_DELETE):
         """DELETE method fails 404 if no id found."""
@@ -286,15 +266,13 @@ class TestDelete:
 
 
 @mark.parametrize("endpoint", ["benchmarks.approve"], indirect=True)
-@mark.parametrize(
-    "benchmark_id",
-    indirect=True,
-    argvalues=[
-        benchmarks[3]["id"],
-    ],
-)
+@mark.parametrize("benchmark_id", indirect=True, argvalues=[
+    benchmarks[3]["id"],
+])
 class TestApprove:
     @mark.usefixtures("grant_admin")
+    @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
+    @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     def test_204(self, response_POST, benchmark):
         """POST method succeeded 200."""
         assert response_POST.status_code == 204
@@ -305,13 +283,16 @@ class TestApprove:
         assert response_POST.status_code == 401
         assert benchmark.status.name == "on_review"
 
-    @mark.usefixtures("grant_logged")
+    @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
+    @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     def test_403(self, response_POST, benchmark):
         """POST method fails 403 if method forbidden."""
         assert response_POST.status_code == 403
         assert benchmark.status.name == "on_review"
 
     @mark.usefixtures("grant_admin")
+    @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
+    @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize("request_id", [uuid4()], indirect=True)
     def test_404(self, response_POST, benchmark):
         """POST method fails 404 if no id found."""
@@ -320,15 +301,13 @@ class TestApprove:
 
 
 @mark.parametrize("endpoint", ["benchmarks.reject"], indirect=True)
-@mark.parametrize(
-    "benchmark_id",
-    indirect=True,
-    argvalues=[
-        benchmarks[4]["id"],
-    ],
-)
+@mark.parametrize("benchmark_id", indirect=True, argvalues=[
+    benchmarks[4]["id"],
+])
 class TestReject:
     @mark.usefixtures("grant_admin")
+    @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
+    @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     def test_204(self, response_POST, benchmark):
         """POST method succeeded 200."""
         assert response_POST.status_code == 204
@@ -339,13 +318,16 @@ class TestReject:
         assert response_POST.status_code == 401
         assert benchmark.status.name == "on_review"
 
-    @mark.usefixtures("grant_logged")
+    @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
+    @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     def test_403(self, response_POST, benchmark):
         """POST method fails 403 if method forbidden."""
         assert response_POST.status_code == 403
         assert benchmark.status.name == "on_review"
 
     @mark.usefixtures("grant_admin")
+    @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
+    @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize("request_id", [uuid4()], indirect=True)
     def test_404(self, response_POST, benchmark):
         """POST method fails 404 if no id found."""

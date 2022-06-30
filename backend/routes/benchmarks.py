@@ -51,6 +51,7 @@ def __list(query_args):
 @blp.route(collection_url, methods=["POST"])
 @blp.doc(operationId='CreateBenchmark')
 @flaat.access_level("user")
+@flaat.inject_user_infos()
 @blp.arguments(schemas.CreateBenchmark)
 @blp.response(201, schemas.Benchmark)
 def create(*args, **kwargs):
@@ -65,7 +66,7 @@ def create(*args, **kwargs):
     return __create(*args, **kwargs)
 
 
-def __create(body_args):
+def __create(body_args, user_infos):
     """Creates a new benchmark in the database.
 
     :param body_args: The request body arguments as python dictionary
@@ -82,6 +83,8 @@ def __create(body_args):
         error_msg = f"Image {image}:{tag} not found in dockerhub"
         abort(422, messages={'error': error_msg})
 
+    subiss = user_infos.subject, user_infos.issuer
+    body_args['uploader'] = models.User.read(subiss)
     benchmark = models.Benchmark.create(body_args)
 
     try:  # Transaction execution
