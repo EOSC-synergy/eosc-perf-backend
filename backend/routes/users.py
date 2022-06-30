@@ -56,7 +56,7 @@ def __list(query_args):
 @blp.doc(operationId='RegisterSelf')
 @flaat.inject_user_infos()
 @blp.response(201, schemas.User)
-def register(user_infos, *args, **kwargs):
+def register(*args, **kwargs):
     """(OIDC Token) Registers the logged in user
 
     Use this method to register yourself into the application. By using
@@ -66,7 +66,7 @@ def register(user_infos, *args, **kwargs):
 
     The method will return your stored information.
     """
-    return __register(user_infos, *args, **kwargs)
+    return __register(*args, **kwargs)
 
 
 def __register(user_infos):
