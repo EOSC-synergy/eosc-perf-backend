@@ -105,15 +105,18 @@ class HasClaims(SoftDelete):
             backref=backref("resource", uselist=False),
         )
 
-    def claim(self, message):
+    def claim(self, claimer, message):
         """Creates a pending claim related to the resource and soft
         deletes the resource.
 
+        :param claimer: Message to include in the claim
+        :type claimer: models.User 
         :param message: Message to include in the claim
         :type message: str
         """
         self.delete()
         return self.__class__._claim_report_class(
+            uploader=claimer,
             message=message,
             resource=self
         )

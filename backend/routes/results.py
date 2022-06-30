@@ -117,6 +117,7 @@ def __list(query_args):
 @blp.route(collection_url, methods=["POST"])
 @blp.doc(operationId='CreateResult')
 @flaat.access_level("user")
+@flaat.inject_user_infos()
 @blp.arguments(args.ResultContext, location='query')
 @blp.arguments(schemas.Json)
 @blp.response(201, schemas.Result)
@@ -136,7 +137,7 @@ def create(*args, **kwargs):
     return __create(*args, **kwargs)
 
 
-def __create(query_args, body_args):
+def __create(query_args, body_args, user_infos):
     """Creates a new result in the database.
 
     :param query_args: The request query arguments as python dictionary
@@ -173,6 +174,7 @@ def __create(query_args, body_args):
         benchmark=get(models.Benchmark, query_args.pop('benchmark_id')),
         flavor=get(models.Flavor, query_args.pop('flavor_id')),
         tags=[get(models.Tag, id) for id in query_args.pop('tags_ids')],
+        uploader=models.User.read((user_infos.subject, user_infos.issuer)),
         json=body_args, **query_args
     ))
 
@@ -297,6 +299,7 @@ def __delete(result_id):
 @blp.route(resource_url + ":claim", methods=["POST"])
 @blp.doc(operationId='ClaimReport')
 @flaat.access_level("user")
+@flaat.inject_user_infos()
 @blp.arguments(schemas.CreateClaim)
 @blp.response(201, schemas.Claim)
 def claim(*args, **kwargs):
@@ -310,7 +313,7 @@ def claim(*args, **kwargs):
     return __claim(*args, **kwargs)
 
 
-def __claim(body_args, result_id):
+def __claim(body_args, result_id, user_infos):
     """Creates a claim linked to the report
 
     If no result exists with the indicated id, then 404 NotFound
@@ -324,7 +327,10 @@ def __claim(body_args, result_id):
     :raises UnprocessableEntity: Wrong query/body parameters
     """
     result = __get(result_id)
-    claim = result.claim(message=body_args['message'])
+    claim = result.claim(
+        claimer=models.User.read((user_infos.subject, user_infos.issuer)),
+        message=body_args['message']
+    )
 
     try:  # Transaction execution
         db.session.commit()
@@ -339,6 +345,7 @@ def __claim(body_args, result_id):
 @blp.route(resource_url + '/tags', methods=["PUT"])
 @blp.doc(operationId='UpdateResult')
 @flaat.access_level("user")
+@flaat.inject_user_infos()
 @blp.arguments(schemas.TagsIds)
 @blp.response(204)
 def update_tags(*args, **kwargs):
@@ -349,7 +356,7 @@ def update_tags(*args, **kwargs):
     return __update_tags(*args, **kwargs)
 
 
-def __update_tags(body_args, result_id):
+def __update_tags(body_args, result_id, user_infos):
     """Updates a result specific fields.
 
     If no result exists with the indicated id, then 404 NotFound
@@ -370,9 +377,12 @@ def __update_tags(body_args, result_id):
         tags_ids = body_args.pop('tags_ids')
         body_args['tags'] = [models.Tag.read(id) for id in tags_ids]
 
-    try:
-        result.update(body_args, force=flaat.valid_admin())
-    except PermissionError:
+    subiss = user_infos.subject, user_infos.issuer
+    is_admin = flaat.access_levels[1].requirement.func(user_infos)
+    is_owner = subiss == (result.uploader.sub, result.uploader.iss)
+    if is_admin or is_owner:
+        result.update(body_args)
+    else:
         abort(403)
 
     try:  # Transaction execution
@@ -385,6 +395,7 @@ def __update_tags(body_args, result_id):
 @blp.route(resource_url + "/claims", methods=["GET"])
 @blp.doc(operationId='ListResultClaims')
 @flaat.access_level("user")
+@flaat.inject_user_infos()
 @blp.arguments(args.ClaimFilter, location='query')
 @blp.response(200, schemas.Claims)
 @queries.to_pagination()
@@ -398,7 +409,7 @@ def list_claims(*args, **kwargs):
     return __list_claims(*args, **kwargs)
 
 
-def __list_claims(query_args, result_id):
+def __list_claims(query_args, result_id, user_infos):
     """Returns the result claims filtered by the query args.
 
     :param query_args: The request query arguments as python dictionary
@@ -410,9 +421,10 @@ def __list_claims(query_args, result_id):
     """
     result = __get(result_id)
 
-    if flaat.valid_admin():
-        pass
-    elif models.User.current_user() == result.uploader:
+    subiss = user_infos.subject, user_infos.issuer
+    is_admin = flaat.access_levels[1].requirement.func(user_infos)
+    is_owner = subiss == (result.uploader.sub, result.uploader.iss)
+    if is_admin or is_owner:
         pass
     else:
         abort(403)

@@ -60,14 +60,3 @@ class HasUploader(object):
         return relationship("User", backref=backref(
             f'_{cls.__name__.lower()}s', cascade="all, delete-orphan"
         ))
-
-    def update(self, *args, force=False, **kwargs):
-        """Decorates super() that only owner can edit unless force=True.
-        """
-        if force or self.ownership():
-            super().update(*args, **kwargs)
-        else:
-            raise PermissionError
-
-    def ownership(self):
-        return self.uploader == User.current_user()
