@@ -17,6 +17,7 @@ def url(endpoint, request_id, query):
 
 @mark.parametrize("endpoint", ["benchmarks.list"], indirect=True)
 class TestList:
+
     @mark.parametrize("query", indirect=True, argvalues=[
         {"docker_image": "b1", "docker_tag": "v1.0"},
         {"docker_image": "b1"},  # Query with 1 field
@@ -48,6 +49,7 @@ class TestList:
 
 @mark.parametrize("endpoint", ["benchmarks.create"], indirect=True)
 class TestCreate:
+
     @mark.usefixtures("mock_docker_registry")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
@@ -117,6 +119,7 @@ class TestCreate:
 
 @mark.parametrize("endpoint", ["benchmarks.search"], indirect=True)
 class TestSearch:
+
     @mark.parametrize("query", indirect=True, argvalues=[
         {"terms": ["b1"]},
         {"terms[]": ["b1"]},
@@ -155,6 +158,7 @@ class TestSearch:
     benchmarks[2]["id"],
 ])
 class TestGet:
+
     def test_200(self, benchmark, response_GET):
         """GET method succeeded 200."""
         assert response_GET.status_code == 200
@@ -173,6 +177,7 @@ class TestGet:
     benchmarks[2]["id"],
 ])
 class TestUpdate:
+
     @mark.usefixtures("grant_admin", "mock_docker_registry")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
@@ -235,6 +240,7 @@ class TestUpdate:
 ]
 )
 class TestDelete:
+
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
@@ -270,6 +276,7 @@ class TestDelete:
     benchmarks[3]["id"],
 ])
 class TestApprove:
+
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
@@ -305,6 +312,7 @@ class TestApprove:
     benchmarks[4]["id"],
 ])
 class TestReject:
+    
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)

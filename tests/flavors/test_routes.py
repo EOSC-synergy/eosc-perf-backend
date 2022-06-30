@@ -23,6 +23,7 @@ def url(endpoint, request_id, query):
     flavors[3]["id"],
 ])
 class TestGet:
+
     def test_200(self, flavor, response_GET):
         """GET method succeeded 200."""
         assert response_GET.status_code == 200
@@ -42,6 +43,7 @@ class TestGet:
     flavors[3]["id"],
 ])
 class TestUpdate:
+
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
@@ -97,6 +99,7 @@ class TestUpdate:
     flavors[3]["id"],
 ])
 class TestDelete:
+
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
@@ -146,6 +149,7 @@ class TestDelete:
     flavors[4]["id"],
 ])
 class TestApprove:
+
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
@@ -183,6 +187,7 @@ class TestApprove:
     flavors[4]["id"],
 ])
 class TestReject:
+
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
@@ -221,6 +226,7 @@ class TestReject:
     flavors[2]["id"], flavors[3]["id"],
 ])
 class TestSite:
+    
     def test_200(self, flavor, response_GET):
         """GET method succeeded 200."""
         assert response_GET.status_code == 200

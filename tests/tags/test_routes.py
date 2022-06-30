@@ -17,6 +17,7 @@ def url(endpoint, request_id, query):
 
 @mark.parametrize("endpoint", ["tags.list"], indirect=True)
 class TestList:
+
     @mark.parametrize("query", indirect=True, argvalues=[
         {"name": "tag1"},  # Query with 1 field
         {},  # All results
@@ -44,6 +45,7 @@ class TestList:
 
 @mark.parametrize("endpoint", ["tags.create"], indirect=True)
 class TestCreate:
+
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize("body", indirect=True, argvalues=[
@@ -100,6 +102,7 @@ class TestCreate:
 
 @mark.parametrize("endpoint", ["tags.search"], indirect=True)
 class TestSearch:
+
     @mark.parametrize("query", indirect=True, argvalues=[
         {"terms": ["tag1"]},
         {"terms[]": ["tag1"]},
@@ -137,6 +140,7 @@ class TestSearch:
     tags[3]["id"],
 ])
 class TestGet:
+
     def test_200(self, tag, response_GET):
         """GET method succeeded 200."""
         assert response_GET.status_code == 200
@@ -156,6 +160,7 @@ class TestGet:
     tags[3]["id"],
 ])
 class TestUpdate:
+
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
@@ -211,6 +216,7 @@ class TestUpdate:
     tags[3]["id"],
 ])
 class TestDelete:
+
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)

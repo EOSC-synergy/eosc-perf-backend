@@ -14,6 +14,7 @@ def url(endpoint, request_id, query):
 
 @mark.parametrize("endpoint", ["reports.list_submits"], indirect=True)
 class TestListSubmits:
+
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
@@ -67,6 +68,7 @@ class TestListSubmits:
 
 @mark.parametrize("endpoint", ["reports.list_claims"], indirect=True)
 class TestListClaims:
+    
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)

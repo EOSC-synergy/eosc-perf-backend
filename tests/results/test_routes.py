@@ -25,6 +25,7 @@ post_query = {
 
 @mark.parametrize("endpoint", ["results.list"], indirect=True)
 class TestList:
+
     @mark.parametrize("query", indirect=True, argvalues=[
         {"benchmark_id": benchmarks[0]["id"]},
         {"site_id": flavors[0]["site__id"]},
@@ -72,6 +73,7 @@ class TestList:
 
 @mark.parametrize("endpoint", ["results.create"], indirect=True)
 class TestCreate:
+
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize("query", indirect=True, argvalues=[
@@ -157,6 +159,7 @@ class TestCreate:
 
 @mark.parametrize("endpoint", ["results.search"], indirect=True)
 class TestSearch:
+
     @mark.parametrize("query", indirect=True, argvalues=[
         {"terms": [benchmarks[0]["docker_image"]]},
         {"terms[]": [benchmarks[0]["docker_image"]]},
@@ -201,6 +204,7 @@ class TestSearch:
     results[1]["id"],
 ])
 class TestGet:
+
     def test_200(self, result, response_GET):
         """GET method succeeded 200."""
         assert response_GET.status_code == 200
@@ -218,6 +222,7 @@ class TestGet:
     results[1]["id"],
 ])
 class TestDelete:
+
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
@@ -264,6 +269,7 @@ class TestDelete:
     results[1]["id"],
 ])
 class TestClaim:
+
     @mark.parametrize("token_sub", [users[1]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[1]["iss"]], indirect=True)
     @mark.parametrize("body", indirect=True, argvalues=[
@@ -317,6 +323,7 @@ class TestClaim:
     results[1]["id"],
 ])
 class TestUpdateTags:
+
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize("body", indirect=True, argvalues=[
@@ -394,6 +401,7 @@ class TestUpdateTags:
     results[3]["id"],
 ])
 class TestListClaims:
+
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize("query", indirect=True, argvalues=[
@@ -480,6 +488,7 @@ class TestListClaims:
     results[1]["id"],
 ])
 class TestGetUploader:
+    
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)

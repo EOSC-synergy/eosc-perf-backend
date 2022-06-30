@@ -17,6 +17,7 @@ def url(endpoint, request_id, query):
 
 @mark.parametrize("endpoint", ["sites.list"], indirect=True)
 class TestList:
+
     @mark.parametrize("query", indirect=True, argvalues=[
         {"name": sites[0]["name"], "address": sites[0]["address"]},
         {"address": sites[0]["address"]},  # Query with 1 field
@@ -47,6 +48,7 @@ class TestList:
 
 @mark.parametrize("endpoint", ["sites.create"], indirect=True)
 class TestCreate:
+
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize("body", indirect=True, argvalues=[
@@ -104,6 +106,7 @@ class TestCreate:
 
 @mark.parametrize("endpoint", ["sites.search"], indirect=True)
 class TestSearch:
+
     @mark.parametrize("query", indirect=True, argvalues=[
         {"terms": [sites[0]["name"]]},
         {"terms[]": [sites[0]["name"]]},
@@ -144,6 +147,7 @@ class TestSearch:
     sites[1]["id"],
 ])
 class TestGet:
+
     def test_200(self, site, response_GET):
         """GET method succeeded 200."""
         assert response_GET.status_code == 200
@@ -160,6 +164,7 @@ class TestGet:
     sites[1]["id"],
 ])
 class TestUpdate:
+
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
@@ -221,6 +226,7 @@ class TestUpdate:
     sites[1]["id"],
 ])
 class TestDelete:
+
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
@@ -266,6 +272,7 @@ class TestDelete:
     sites[2]["id"],
 ])
 class TestApprove:
+
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
@@ -303,6 +310,7 @@ class TestApprove:
     sites[2]["id"],
 ])
 class TestReject:
+
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
@@ -338,6 +346,7 @@ class TestReject:
 @mark.parametrize("endpoint", ["sites.list_flavors"], indirect=True)
 @mark.parametrize("site_id", indirect=True, argvalues=[sites[0]["id"]])
 class TestListFlavors:
+
     @mark.parametrize("query", indirect=True, argvalues=[
         {"name": flavors[0]["name"]},
         {"name": flavors[2]["name"]},
@@ -373,6 +382,7 @@ class TestListFlavors:
     sites[0]["id"],
 ])
 class TestCreateFlavor:
+
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize("body", indirect=True, argvalues=[
@@ -443,6 +453,7 @@ class TestCreateFlavor:
     sites[0]["id"],
 ])
 class TestSearchFlavors:
+    
     @mark.parametrize("query", indirect=True, argvalues=[
         {"terms": [flavors[0]["name"]]},
         {"terms[]": [flavors[0]["name"]]},
