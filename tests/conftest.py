@@ -5,11 +5,9 @@ import logging
 import os
 
 import factories
-from backend import create_app
-from backend.extensions import db as database
-from backend.extensions import flaat
+from backend import create_app, extensions
 from backend.utils import dockerhub
-from flaat import tokentools
+from flaat.user_infos import UserInfos
 from pytest import fixture
 from pytest_postgresql.janitor import DatabaseJanitor
 
@@ -63,16 +61,16 @@ def app(session_environment):
 @fixture(scope='session')
 def db(app):
     """Create database for the tests."""
-    database.create_all()
+    extensions.db.create_all()
     [factories.DBUser(**x) for x in db_instances.users]
     [factories.DBTag(**x) for x in db_instances.tags]
     [factories.DBBenchmark(**x) for x in db_instances.benchmarks]
     [factories.DBSite(**x) for x in db_instances.sites]
     [factories.DBFlavor(**x) for x in db_instances.flavors]
     [factories.DBResult(**x) for x in db_instances.results]
-    database.session.commit()
-    yield database
-    database.drop_all()
+    extensions.db.session.commit()
+    yield extensions.db
+    extensions.db.drop_all()
 
 
 @fixture(scope='function', autouse=True)
@@ -97,65 +95,38 @@ def token_iss(request):
 
 
 @fixture(scope='function')
-def mock_accesstoken(monkeypatch, token_sub, token_iss):
+def access_token(token_sub, token_iss):
     """Patch fixture to test function with valid oidc token."""
-    monkeypatch.setattr(
-        tokentools,
-        "get_accesstoken_info",
-        lambda _: {
-            'body': {'sub': token_sub, 'iss': token_iss},
-            'exp': 99999999999
-        }
-    )
-    monkeypatch.setattr(
-        tokentools,
-        "get_access_token_from_request",
-        lambda _: "mocktoken"
-    )
+    return "some-access-token" if token_sub and token_iss else None
 
 
 @fixture(scope='function')
-def mock_endpoints(monkeypatch):
-    """Patch fixture to edit information from tokenuser endpoints."""
-    monkeypatch.setattr(
-        flaat,
-        "get_info_from_userinfo_endpoints",
-        lambda _: {}
-    )
-
-
-@fixture(scope='function')
-def introspection_email(request):
+def user_email(request):
     """Returns the email to be returned by the introspection endpoint."""
     return request.param if hasattr(request, 'param') else None
 
 
-@fixture(scope='function')
-def mock_introspection(monkeypatch, introspection_email):
-    """Patch function to provide custom introspection information."""
-    monkeypatch.setattr(
-        flaat,
-        "get_info_from_introspection_endpoints",
-        lambda _: {'email': introspection_email}
+@fixture(scope='function', autouse=True)
+def user_infos(mocker, token_sub, token_iss, user_email):
+    """Patches flaat to edit provided user_infos."""
+    mocker.patch.object(
+        extensions.flaat, "get_user_infos_from_access_token",
+        return_value=UserInfos(
+            access_token_info=None, introspection_info=None,
+            user_info={
+                'email_verified': True, 'email': user_email,
+                'eduperson_entitlement': [],
+                'sub': token_sub, 'iss': token_iss,
+            },
+        )
     )
 
 
 @fixture(scope='function')
-def grant_accesstoken(mock_accesstoken, mock_endpoints, mock_introspection):
-    """Patch fixture to test function with valid oidc token."""
-    pass
-
-
-@fixture(scope='function')
-def grant_logged(monkeypatch, grant_accesstoken):
-    """Patch fixture to test function as logged user."""
-    monkeypatch.setattr(flaat, "valid_user", lambda: True)
-
-
-@fixture(scope='function')
-def grant_admin(monkeypatch, grant_logged):
+def grant_admin(monkeypatch):
     """Patch fixture to test function as admin user."""
-    monkeypatch.setattr(flaat, "valid_admin", lambda: True)
+    admin_assert = extensions.flaat.access_levels[1].requirement
+    monkeypatch.setattr(admin_assert, "func", lambda *args: True)
 
 
 @fixture(scope='function')
@@ -178,36 +149,45 @@ def query(request):
 
 
 @fixture(scope='function')
+def headers(request, access_token):
+    """Fixture that return the body for the request."""
+    headers = {}
+    if access_token:
+        headers["Authorization"] = f"Bearer {access_token}"
+    return headers
+
+
+@fixture(scope='function')
 def body(request):
     """Fixture that return the body for the request."""
     return request.param if hasattr(request, 'param') else {}
 
 
 @fixture(scope='function')
-def response_GET(client, url):
+def response_GET(client, url, headers):
     """Fixture that return the result of a GET request."""
-    return client.get(url)
+    return client.get(url, headers=headers)
 
 
 @fixture(scope='function')
-def response_POST(client, url, body):
+def response_POST(client, url, headers, body):
     """Fixture that return the result of a POST request."""
-    return client.post(url, json=body)
+    return client.post(url, headers=headers, json=body)
 
 
 @fixture(scope='function')
-def response_PUT(client, url, body):
+def response_PUT(client, url, headers, body):
     """Fixture that return the result of a PUT request."""
-    return client.put(url, json=body)
+    return client.put(url, headers=headers, json=body)
 
 
 @fixture(scope='function')
-def response_PATCH(client, url, body):
+def response_PATCH(client, url, headers, body):
     """Fixture that return the result of a PATCH request."""
-    return client.patch(url, json=body)
+    return client.patch(url, headers=headers, json=body)
 
 
 @fixture(scope='function')
-def response_DELETE(client, url):
+def response_DELETE(client, url, headers):
     """Fixture that return the result of a DELETE request."""
-    return client.delete(url)
+    return client.delete(url, headers=headers)
