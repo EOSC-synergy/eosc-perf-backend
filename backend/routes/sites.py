@@ -6,7 +6,7 @@ from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 
 from .. import models, notifications
-from ..extensions import auth, db
+from ..extensions import db, flaat
 from ..schemas import args, schemas
 from ..utils import queries
 
@@ -49,7 +49,8 @@ def __list(query_args):
 
 
 @blp.route(collection_url, methods=['POST'])
-@auth.login_required()
+@flaat.access_level("user")
+@flaat.inject_user_infos()
 @blp.doc(operationId='CreateSite')
 @blp.arguments(schemas.CreateSite)
 @blp.response(201, schemas.Site)
@@ -63,7 +64,7 @@ def create(*args, **kwargs):
     return __create(*args, **kwargs)
 
 
-def __create(body_args):
+def __create(body_args, user_infos):
     """Creates a new site in the database.
 
     :param body_args: The request body arguments as python dictionary
@@ -75,6 +76,8 @@ def __create(body_args):
     :return: The site created into the database.
     :rtype: :class:`models.Site`
     """
+    subiss = user_infos.subject, user_infos.issuer
+    body_args['uploader'] = models.User.read(subiss)
     site = models.Site.create(body_args)
 
     try:  # Transaction execution
@@ -158,7 +161,7 @@ def __get(site_id):
 
 
 @blp.route(resource_url, methods=['PUT'])
-@auth.admin_required()
+@flaat.access_level("admin")
 @blp.doc(operationId='UpdateSite')
 @blp.arguments(schemas.Site)
 @blp.response(204)
@@ -186,7 +189,7 @@ def __update(body_args, site_id):
     :raises UnprocessableEntity: Wrong query/body parameters
     """
     site = __get(site_id)
-    site.update(body_args, force=True)  # Only admins reach here
+    site.update(body_args)  # Only admins reach here
 
     try:  # Transaction execution
         db.session.commit()
@@ -196,7 +199,7 @@ def __update(body_args, site_id):
 
 
 @blp.route(resource_url, methods=['DELETE'])
-@auth.admin_required()
+@flaat.access_level("admin")
 @blp.doc(operationId='DeleteSite')
 @blp.response(204)
 def delete(*args, **kwargs):
@@ -230,7 +233,7 @@ def __delete(site_id):
 
 
 @blp.route(resource_url + ":approve", methods=["POST"])
-@auth.admin_required()
+@flaat.access_level("admin")
 @blp.doc(operationId='ApproveSite')
 @blp.response(204)
 def approve(*args, **kwargs):
@@ -271,7 +274,7 @@ def __approve(site_id):
 
 @blp.route(resource_url + ":reject", methods=["POST"])
 @blp.doc(operationId='RejectSite')
-@auth.admin_required()
+@flaat.access_level("admin")
 @blp.response(204)
 def reject(*args, **kwargs):
     """(Admins) Rejects a site to safe delete it.
@@ -347,7 +350,8 @@ def __list_flavors(query_args, site_id):
 
 
 @blp.route(resource_url + '/flavors', methods=['POST'])
-@auth.login_required()
+@flaat.access_level("user")
+@flaat.inject_user_infos()
 @blp.doc(operationId='AddFlavor')
 @blp.arguments(schemas.CreateFlavor)
 @blp.response(201, schemas.Flavor)
@@ -361,7 +365,7 @@ def create_flavor(*args, **kwargs):
     return __create_flavor(*args, **kwargs)
 
 
-def __create_flavor(body_args, site_id):
+def __create_flavor(body_args, site_id, user_infos):
     """Creates a flavor linked to a site id.
 
     :param body_args: The request body arguments as python dictionary
@@ -376,6 +380,9 @@ def __create_flavor(body_args, site_id):
     :rtype: :class:`models.Flavor`
     """
     __get(site_id)   # Return 404 if the site does not exist
+
+    subiss = user_infos.subject, user_infos.issuer
+    body_args['uploader'] = models.User.read(subiss)
     body_args['site_id'] = site_id
     flavor = models.Flavor.create(body_args)
 

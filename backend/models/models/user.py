@@ -5,7 +5,6 @@ from sqlalchemy import Column, DateTime, Text
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import backref, relationship
 
-from ...extensions import auth
 from ..core import TokenModel
 
 
@@ -39,11 +38,6 @@ class User(TokenModel):
         """Human-readable representation string"""
         return "<{} {}>".format(self.__class__.__name__, self.email)
 
-    @classmethod
-    def current_user(cls):
-        tokeninfo = auth.current_tokeninfo()
-        return cls.read((tokeninfo['sub'], tokeninfo['iss']))
-
 
 class HasUploader(object):
     """Mixin that adds an User as upload details to any model."""
@@ -60,25 +54,9 @@ class HasUploader(object):
     #: (ISO8601) Upload datetime of the model instance
     upload_datetime = Column(DateTime, nullable=False, default=dt.now)
 
-    def __init__(self, **properties):
-        super().__init__(**properties)
-        if self.uploader is None:
-            self.uploader = User.current_user()
-
     @declared_attr
     def uploader(cls):
         """(User class) User that uploaded the model instance"""
         return relationship("User", backref=backref(
             f'_{cls.__name__.lower()}s', cascade="all, delete-orphan"
         ))
-
-    def update(self, *args, force=False, **kwargs):
-        """Decorates super() that only owner can edit unless force=True.
-        """
-        if force or self.ownership():
-            super().update(*args, **kwargs)
-        else:
-            raise PermissionError
-
-    def ownership(self):
-        return self.uploader == User.current_user()

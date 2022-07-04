@@ -8,15 +8,16 @@ Each extension requires of a specific class initialization which is
 lately initialized in the application factory using the settings and
 configurations from the environment.
 """
+from flaat.flask import Flaat
 from flask_mailman import Mail
 from flask_migrate import Migrate
 from flask_smorest import Api
 from flask_sqlalchemy import SQLAlchemy
 
-from .authorization import Authorization
+from backend import authorization
 
 #: Flask extension that provides support for handling oidc Access Tokens
-auth = Authorization()
+flaat = Flaat(authorization.access_levels)
 
 #: Flask framework library for creating REST APIs (i.e. OpenAPI)
 api = Api()

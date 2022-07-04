@@ -6,7 +6,7 @@ from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 
 from .. import models, notifications, utils
-from ..extensions import auth, db
+from ..extensions import db, flaat
 from ..schemas import args, schemas
 from ..utils import queries
 
@@ -50,7 +50,8 @@ def __list(query_args):
 
 @blp.route(collection_url, methods=["POST"])
 @blp.doc(operationId='CreateBenchmark')
-@auth.login_required()
+@flaat.access_level("user")
+@flaat.inject_user_infos()
 @blp.arguments(schemas.CreateBenchmark)
 @blp.response(201, schemas.Benchmark)
 def create(*args, **kwargs):
@@ -65,7 +66,7 @@ def create(*args, **kwargs):
     return __create(*args, **kwargs)
 
 
-def __create(body_args):
+def __create(body_args, user_infos):
     """Creates a new benchmark in the database.
 
     :param body_args: The request body arguments as python dictionary
@@ -82,6 +83,8 @@ def __create(body_args):
         error_msg = f"Image {image}:{tag} not found in dockerhub"
         abort(422, messages={'error': error_msg})
 
+    subiss = user_infos.subject, user_infos.issuer
+    body_args['uploader'] = models.User.read(subiss)
     benchmark = models.Benchmark.create(body_args)
 
     try:  # Transaction execution
@@ -174,7 +177,7 @@ def __get(benchmark_id):
 
 @blp.route(resource_url, methods=["PUT"])
 @blp.doc(operationId='UpdateBenchmark')
-@auth.admin_required()
+@flaat.access_level("admin")
 @blp.arguments(schemas.Benchmark)
 @blp.response(204)
 def update(*args, **kwargs):
@@ -206,7 +209,7 @@ def __update(body_args, benchmark_id):
         abort(422, messages={'error': error_msg})
 
     benchmark = __get(benchmark_id)
-    benchmark.update(body_args, force=True)  # Only admins reach here
+    benchmark.update(body_args)  # Only admins reach here
 
     try:  # Transaction execution
         db.session.commit()
@@ -217,7 +220,7 @@ def __update(body_args, benchmark_id):
 
 @blp.route(resource_url, methods=["DELETE"])
 @blp.doc(operationId='DeleteBenchmark')
-@auth.admin_required()
+@flaat.access_level("admin")
 @blp.arguments(args.Schema(), location='query', as_kwargs=True)
 @blp.response(204)
 def delete(*args, **kwargs):
@@ -252,7 +255,7 @@ def __delete(benchmark_id):
 
 @blp.route(resource_url + ":approve", methods=["POST"])
 @blp.doc(operationId='ApproveBenchmark')
-@auth.admin_required()
+@flaat.access_level("admin")
 @blp.arguments(args.Schema(), location='query', as_kwargs=True)
 @blp.response(204)
 def approve(*args, **kwargs):
@@ -293,7 +296,7 @@ def __approve(benchmark_id):
 
 @blp.route(resource_url + ":reject", methods=["POST"])
 @blp.doc(operationId='RejectBenchmark')
-@auth.admin_required()
+@flaat.access_level("admin")
 @blp.arguments(args.Schema(), location='query', as_kwargs=True)
 @blp.response(204)
 def reject(*args, **kwargs):

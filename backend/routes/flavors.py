@@ -5,7 +5,7 @@ from flask_smorest import Blueprint, abort
 from sqlalchemy.exc import IntegrityError
 
 from .. import models, notifications
-from ..extensions import auth, db
+from ..extensions import db, flaat
 from ..schemas import schemas
 
 blp = Blueprint(
@@ -49,7 +49,7 @@ def __get(flavor_id):
 
 @blp.route(resource_url, methods=["PUT"])
 @blp.doc(operationId='UpdateFlavor')
-@auth.admin_required()
+@flaat.access_level("admin")
 @blp.arguments(schemas.Flavor)
 @blp.response(204)
 def update(*args, **kwargs):
@@ -80,7 +80,7 @@ def __update(body_args, flavor_id):
         error_msg = f"Record {flavor_id} not found in the database"
         abort(404, messages={'error': error_msg})
 
-    flavor.update(body_args, force=True)  # Only admins reach here
+    flavor.update(body_args)  # Only admins reach here
 
     try:  # Transaction execution
         db.session.commit()
@@ -91,7 +91,7 @@ def __update(body_args, flavor_id):
 
 @blp.route(resource_url, methods=["DELETE"])
 @blp.doc(operationId='DeleteFlavor')
-@auth.admin_required()
+@flaat.access_level("admin")
 @blp.response(204)
 def delete(*args, **kwargs):
     """(Admins) Deletes an existing flavor
@@ -129,7 +129,7 @@ def __delete(flavor_id):
 
 @blp.route(resource_url + ":approve", methods=["POST"])
 @blp.doc(operationId='ApproveFlavor')
-@auth.admin_required()
+@flaat.access_level("admin")
 @blp.response(204)
 def approve(*args, **kwargs):
     """(Admins) Approves a flavor to include it on default list methods
@@ -169,7 +169,7 @@ def __approve(flavor_id):
 
 @blp.route(resource_url + ":reject", methods=["POST"])
 @blp.doc(operationId='RejectFlavor')
-@auth.admin_required()
+@flaat.access_level("admin")
 @blp.response(204)
 def reject(*args, **kwargs):
     """(Admins) Rejects a flavor to safe delete it.

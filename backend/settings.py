@@ -52,6 +52,7 @@ def development_defaults(func):
 bool = development_defaults(env.bool)
 int = development_defaults(env.int)
 str = development_defaults(env.str)
+list = development_defaults(env.list)
 
 
 # Secret key for security and cookie encryption
@@ -140,7 +141,20 @@ BCRYPT_LOG_ROUNDS = int("BCRYPT_LOG_ROUNDS", default=12)
 
 
 # Authorization configuration.
-OIDC_CLIENT_ID = str("OIDC_CLIENT_ID", dev_default="not-defined")
+TRUSTED_OP_LIST = list("TRUSTED_OP_LIST", default=[
+    'https://aai.egi.eu/oidc',
+    'https://aai-demo.egi.eu/auth/realms/egi',
+    'https://aai-dev.egi.eu/auth/realms/egi',
+])
+"""| Trusted OIDC Providers, default value stands for:
+|  - 'https://aai.egi.eu/oidc'
+|  - 'https://aai-demo.egi.eu/auth/realms/egi'
+|  - 'https://aai-dev.egi.eu/auth/realms/egi'
+
+:meta hide-value:
+"""
+
+FLAAT_CLIENT_ID = str("OIDC_CLIENT_ID", dev_default="not-defined")
 """| OIDC Client Identifier valid at the Authorization Server.
 | See https://openid.net/specs/openid-connect-core-1_0.html
 
@@ -150,7 +164,7 @@ OIDC_CLIENT_ID = str("OIDC_CLIENT_ID", dev_default="not-defined")
 :meta hide-value:
 """
 
-OIDC_CLIENT_SECRET = str("OIDC_CLIENT_SECRET", default="", dev_default=".")
+FLAAT_CLIENT_SECRET = str("OIDC_CLIENT_SECRET", default="", dev_default=".")
 """| Secret to validate the application identify on the Authorization Server.
 | See https://openid.net/specs/openid-connect-core-1_0.html
 
@@ -160,7 +174,7 @@ OIDC_CLIENT_SECRET = str("OIDC_CLIENT_SECRET", default="", dev_default=".")
 :meta hide-value:
 """
 
-OIDC_CLIENT_SECRET_FILE = str("OIDC_CLIENT_SECRET_FILE", default="")
+FLAAT_CLIENT_SECRET_FILE = str("OIDC_CLIENT_SECRET_FILE", default="")
 """| Path to a secret file to define `OIDC_CLIENT_SECRET`.
 
 | The secret inside the file overwrites the environment SECRET_KEY therefore
@@ -168,32 +182,18 @@ OIDC_CLIENT_SECRET_FILE = str("OIDC_CLIENT_SECRET_FILE", default="")
 
 :meta hide-value:
 """
-if OIDC_CLIENT_SECRET_FILE:
-    OIDC_CLIENT_SECRET = open(OIDC_CLIENT_SECRET_FILE).read().rstrip('\n')
-if not OIDC_CLIENT_SECRET:
+if FLAAT_CLIENT_SECRET_FILE:
+    FLAAT_CLIENT_SECRET = open(FLAAT_CLIENT_SECRET_FILE).read().rstrip('\n')
+if not FLAAT_CLIENT_SECRET:
     raise EnvError("Environment variable 'OIDC_CLIENT_SECRET' empty")
 
-ADMIN_ENTITLEMENTS = str("ADMIN_ENTITLEMENTS", default="")
+ADMIN_ENTITLEMENTS = list("ADMIN_ENTITLEMENTS", default=[])
 """| OIDC Entitlements to grant administrator rights to users.
 | By default no entitlements are defined to grant administrator rights,
   default=[].
 
 :meta hide-value:
 """
-
-DISABLE_ADMIN_PROTECTION = bool(
-    "DISABLE_ADMIN_PROTECTION", default=False, dev_default=True
-)
-"""| Administrator methods can be acceed by any user.
-| **Warning**: Users information is collected using OIDC.
-| OIDC configuration is still needed in order to create new valid users.
-
-| When ENV is set to `production`, the default value stands to: "False".
-| When ENV is set to `development`, the default value stands to: "True".
-
-:meta hide-value:
-"""
-
 
 # Email and notification configuration.
 MAIL_SUPPORT = str("MAIL_SUPPORT", default="")

@@ -5,7 +5,7 @@ from flask_smorest import Blueprint, abort
 from sqlalchemy.exc import IntegrityError
 
 from .. import models, notifications
-from ..extensions import auth, db
+from ..extensions import db, flaat
 from ..schemas import args, schemas
 from ..utils import queries
 from . import results as results_routes
@@ -21,7 +21,7 @@ resource_url = "/self"
 
 @blp.route(collection_url, methods=["GET"])
 @blp.doc(operationId='ListUsers')
-@auth.admin_required()
+@flaat.access_level("admin")
 @blp.arguments(args.UserFilter, location='query')
 @blp.response(200, schemas.Users)
 @queries.to_pagination()
@@ -54,7 +54,7 @@ def __list(query_args):
 
 @blp.route(collection_url + ':register', methods=["POST"])
 @blp.doc(operationId='RegisterSelf')
-@auth.token_required()
+@flaat.inject_user_infos()
 @blp.response(201, schemas.User)
 def register(*args, **kwargs):
     """(OIDC Token) Registers the logged in user
@@ -69,22 +69,17 @@ def register(*args, **kwargs):
     return __register(*args, **kwargs)
 
 
-def __register():
+def __register(user_infos):
     """Registers the current request user.
 
     :raises Unauthorized: The server could not verify your identity
     :raises Forbidden: You are not registered
     """
-    tokeninfo = auth.current_tokeninfo()
-    user_info = auth.current_userinfo()
-    if not user_info:
-        error_msg = "No user info received from 'OP endpoint'"
-        abort(500, messages={'error': error_msg})
-    elif 'email' not in user_info:
+    if 'email' not in user_infos.user_info:
         abort(422, messages={'error': "No scope for email in oidc token"})
 
-    user_properties = {k: tokeninfo[k] for k in ['iss', 'sub']}
-    user_properties['email'] = user_info['email']
+    user_properties = {k: user_infos.user_info[k] for k in ['iss', 'sub']}
+    user_properties['email'] = user_infos.user_info['email']
     user = models.User.create(user_properties)
 
     try:  # Transaction execution
@@ -99,7 +94,7 @@ def __register():
 
 @blp.route(collection_url + ':remove', methods=["POST"])
 @blp.doc(operationId='RemoveUsers')
-@auth.admin_required()
+@flaat.access_level("admin")
 @blp.arguments(args.UserDelete, location='query')
 @blp.response(204)
 def remove(*args, **kwargs):
@@ -139,7 +134,7 @@ def __remove(query_args):
 
 @blp.route(collection_url + ':search', methods=["GET"])
 @blp.doc(operationId='SearchUsers')
-@auth.admin_required()
+@flaat.access_level("admin")
 @blp.arguments(args.UserSearch, location='query')
 @blp.response(200, schemas.Users)
 @queries.to_pagination()
@@ -178,7 +173,7 @@ def __search(query_args):
 
 @blp.route(resource_url, methods=["GET"])
 @blp.doc(operationId='GetSelf')
-@auth.login_required()
+@flaat.inject_user_infos()  # Fail if no valid authentication is provided
 @blp.response(200, schemas.User)
 def get(*args, **kwargs):
     """(Users) Retrieves the logged in user info
@@ -188,7 +183,7 @@ def get(*args, **kwargs):
     return __get(*args, **kwargs)
 
 
-def __get():
+def __get(user_infos):
     """Retrieves the current request user.
 
     :raises Unauthorized: The server could not verify your identity
@@ -196,7 +191,7 @@ def __get():
     :return: The database user matching the oidc token information
     :rtype: :class:`models.User`
     """
-    user = models.User.current_user()
+    user = models.User.read((user_infos['sub'], user_infos['iss']))
     if user is None:
         error_msg = "User not registered"
         abort(404, messages={'error': error_msg})
@@ -206,7 +201,8 @@ def __get():
 
 @blp.route(resource_url + ':update', methods=["POST"])
 @blp.doc(operationId='UpdateSelf')
-@auth.login_required()
+@flaat.access_level("user")
+@flaat.inject_user_infos()
 @blp.response(204)
 def update(*args, **kwargs):
     """(Users) Updates the logged in user info
@@ -218,21 +214,23 @@ def update(*args, **kwargs):
     return __update(*args, **kwargs)
 
 
-def __update():
+def __update(user_infos):
     """ Updates the user information from introspection endpoint.
 
     :raises Unauthorized: The server could not verify your identity
     :raises Forbidden: You are not registered
     """
-    user = __get()
-    user_info = auth.current_userinfo()
-    if not user_info:
-        error_msg = "No user info received from 'introspection endpoint'"
-        abort(500, messages={'error': error_msg})
-    elif 'email' not in user_info:
+    user = __get(user_infos)
+    if not user_infos:
+        abort(500, messages={'error': "No user information from token"})
+    elif 'email' not in user_infos.user_info:
         abort(422, messages={'error': "No scope for email in oidc token"})
+    elif 'email_verified' not in user_infos.user_info:
+        abort(422, messages={'error': "No email_verified status in user"})
+    elif not user_infos.user_info['email_verified']:
+        abort(422, messages={'error': "Email unverified by OIDC provider"})
 
-    user.update({'email': user_info['email']})
+    user.update({'email': user_infos['email']})
 
     try:  # Transaction execution
         db.session.commit()
@@ -245,7 +243,7 @@ def __update():
 
 @blp.route(resource_url + ":try_admin", methods=["GET"])
 @blp.doc(operationId='TryAdmin')
-@auth.admin_required()
+@flaat.access_level("admin")
 @blp.response(204)
 def try_admin():
     """(Admins) Returns 204 if you are admin
@@ -262,7 +260,8 @@ def try_admin():
 
 @blp.route(resource_url + "/results", methods=["GET"])
 @blp.doc(operationId='ListUserResults')
-@auth.login_required()
+@flaat.access_level("user")
+@flaat.inject_user_infos()
 @blp.arguments(args.ResultFilter, location='query')
 @blp.response(200, schemas.Results)
 @queries.to_pagination()
@@ -278,20 +277,21 @@ def results(*args, **kwargs):
     return __results(*args, **kwargs)
 
 
-def __results(query_args):
+def __results(query_args, user_infos):
     """Returns the user uploaded results filtered by the query args.
 
     :raises Unauthorized: The server could not verify your identity
     :raises Forbidden: You don't have the administrator rights
     """
-    user = __get()
+    user = __get(user_infos)
     query = results_routes.__list(query_args)
     return query.with_deleted().filter_by(uploader=user)
 
 
 @blp.route(resource_url + "/claims", methods=["GET"])
 @blp.doc(operationId='ListUserClaims')
-@auth.login_required()
+@flaat.access_level("user")
+@flaat.inject_user_infos()
 @blp.arguments(args.ClaimFilter, location='query')
 @blp.response(200, schemas.Claims)
 @queries.to_pagination()
@@ -305,12 +305,12 @@ def claims(*args, **kwargs):
     return __claims(*args, **kwargs)
 
 
-def __claims(query_args):
+def __claims(query_args, user_infos):
     """Returns the user uploaded claims filtered by the query args.
 
     :raises Unauthorized: The server could not verify your identity
     :raises Forbidden: You don't have the administrator rights
     """
-    user = __get()
+    user = __get(user_infos)
     query = models.Claim.query
     return query.filter_by(uploader=user, **query_args)
