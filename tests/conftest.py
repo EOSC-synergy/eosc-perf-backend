@@ -115,7 +115,6 @@ def user_infos(mocker, token_sub, token_iss, user_email):
             access_token_info=None, introspection_info=None,
             user_info={
                 'email_verified': True, 'email': user_email,
-                'eduperson_entitlement': [],
                 'sub': token_sub, 'iss': token_iss,
             },
         )
