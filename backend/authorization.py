@@ -13,7 +13,10 @@ def is_registered(user_infos):
 
 def is_admin(user_infos):
     """Assert registration and entitlements."""
-    entitlements = set(user_infos.user_info['eduperson_entitlement'])
+    if 'eduperson_entitlement' in user_infos.user_info:
+        entitlements = set(user_infos.user_info['eduperson_entitlement'])
+    else:
+        entitlements = set()
     return all([
         entitlements & set(current_app.config['ADMIN_ENTITLEMENTS']),
         is_registered(user_infos),
