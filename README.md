@@ -11,9 +11,8 @@ FLASK_ENV=<production-or-development>
 FLASK_APP=autoapp.py
 GUNICORN_WORKERS=1
 SECRET_KEY=<desired-cookie-encryption-key>
-OIDC_CLIENT_ID=<your-odic-client-secret>
-OIDC_CLIENT_SECRET=<your-odic-client-secret>
-ADMIN_ENTITLEMENTS=<only-used-in-production>
+TRUSTED_OP_LIST=<trusted-op>
+ADMIN_ENTITLEMENTS=<required-in-production>
 DB_HOST=localhost
 DB_PORT=5432
 DB_USER=<my-non-super-user>
@@ -29,7 +28,7 @@ To run the application on production, container technologies is the recommended 
 To run the application on production the following environment variables and secrets need to be set:
 ```ini
 FLASK_ENV=production
-ADMIN_ENTITLEMENTS=[<entitlements-for-admin>]
+ADMIN_ENTITLEMENTS=<entitlements-for-admin>
 ...
 ```
 
