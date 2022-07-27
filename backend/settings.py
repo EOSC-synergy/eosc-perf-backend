@@ -154,16 +154,6 @@ TRUSTED_OP_LIST = list("TRUSTED_OP_LIST", default=[
 :meta hide-value:
 """
 
-FLAAT_CLIENT_ID = str("OIDC_CLIENT_ID", dev_default="not-defined")
-"""| OIDC Client Identifier valid at the Authorization Server.
-| See https://openid.net/specs/openid-connect-core-1_0.html
-
-| When ENV is set to `production`, a configuration value is required.
-| When ENV is set to `development`, the default value stands to: "not-defined".
-
-:meta hide-value:
-"""
-
 ADMIN_ENTITLEMENTS = list("ADMIN_ENTITLEMENTS", dev_default=[])
 """| OIDC Entitlements to grant administrator rights to users.
 
