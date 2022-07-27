@@ -38,7 +38,6 @@ ADMIN_ENTITLEMENTS=<entitlements-for-admin>
 Secrets are sensitive data which are not generally safe as environment variables. If you are using a docker compose configuration or similar technology which supports the usage of secrets, you can configure the following environment variables to indicate the location of the secret configuration file:
 ```ini
 SECRET_KEY_FILE=<path/to/cookie-secret/file>
-OIDC_CLIENT_SECRET_FILE=<path/to/OIDC-secret/file>
 ```
 
 > Note when the `_FILE` version of the environment variable is set, the direct version of the environment variable is ignored.
