@@ -240,21 +240,21 @@ class ResultFilter(Pagination, UploadFilter, Schema):
     #: Unique Identifier for result associated benchmark
     benchmark_id = fields.UUID(
         description="UUID benchmark unique identification",
-        example=str(uuid4()),
+        example="17d56d83-24e0-47ca-bf4b-c76a467d7e0c",
     )
 
     #: (Site.id):
     #: Unique Identifier for result associated site
     site_id = fields.UUID(
         description="UUID site unique identification",
-        example=str(uuid4()),
+        example="'86067ee9-5cb5-43e5-a361-568abe479fe2'",
     )
 
     #: (Flavor.id):
     #: Unique Identifier for result associated flavor
     flavor_id = fields.UUID(
         description="UUID flavor unique identification",
-        example=str(uuid4()),
+        example="f5224987-8f1e-4969-9759-44c3b3ce1bb7",
     )
 
     #: ([Tag.id], required):
@@ -262,10 +262,14 @@ class ResultFilter(Pagination, UploadFilter, Schema):
     tags_ids = fields.List(
         fields.UUID(
             description="UUID tag unique identification",
-            example=str(uuid4()), required=True,
+            example="ae8aa866-79d8-4aef-8b57-424bb3cd8cdc",
+            required=True,
         ),
         description="UUID tags unique identifications",
-        example=[str(uuid4()) for _ in range(2)],
+        example=[
+            "6e96766d-00d4-4f5d-8e5f-7406d1a26c53",
+            "db90801d-6e03-4d8d-a9dc-2ecb65a02078",
+        ],
     )
 
     #: (String; <json.path> <operation> <value>)
@@ -307,14 +311,14 @@ class ResultContext(Schema):
     #: Unique Identifier for result associated benchmark
     benchmark_id = fields.UUID(
         description="UUID benchmark unique identification",
-        example=str(uuid4()), required=True,
+        example="cc4f0a67-c626-4778-8658-62835b9cf899", required=True,
     )
 
     #: (Flavor.id, required):
     #: Unique Identifier for result associated flavor
     flavor_id = fields.UUID(
         description="UUID flavor unique identification",
-        example=str(uuid4()), required=True,
+        example="2fc5aba1-0330-43ee-8e6d-ea42786d3495", required=True,
     )
 
     #: ([Tag.id], default=[]):
@@ -322,10 +326,14 @@ class ResultContext(Schema):
     tags_ids = fields.List(
         fields.UUID(
             description="UUID tag unique identification",
-            example=str(uuid4()), required=True,
+            example="960110b3-c41e-4534-8612-852fdad7be74", required=True,
         ),
         description="UUID tags unique identifications",
-        example=[str(uuid4()) for _ in range(2)], load_default=[],
+        load_default=[],
+        example=[
+            "7b2519ed-56bf-4f14-bd1c-10b51f33c705",
+            "c92c1a42-4f17-4f19-a5e9-fe6dc3e037fa",
+        ]
     )
 
 

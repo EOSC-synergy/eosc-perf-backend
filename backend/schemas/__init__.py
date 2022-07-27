@@ -10,8 +10,6 @@ This objects come into 2 types:
  - Schemas: JSON structures used to operate model instances
  - Arguments: Query arguments to control route method parameters
 """
-from uuid import uuid4
-
 from marshmallow import Schema, fields, pre_load, post_dump
 from marshmallow.validate import OneOf, Range
 from werkzeug.datastructures import ImmutableMultiDict
@@ -108,7 +106,8 @@ class Id(Schema):
     #: Primary key with an Unique Identifier for the model instance
     id = fields.UUID(
         description="UUID resource unique identification",
-        example=str(uuid4()), required=True, dump_only=True,
+        example="77e88a60-5d33-43d3-b802-27273278489e",
+        required=True, dump_only=True,
     )
 
 

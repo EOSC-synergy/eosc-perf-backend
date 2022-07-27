@@ -67,7 +67,8 @@ class Submit(UploadDatetime, Schema):
     #: Resource unique identification
     resource_id = fields.UUID(
         description="UUID resource unique identification",
-        example=str(uuid.uuid4()), required=True
+        example="b491d3ee-064d-48a2-9547-0c4c636466db",
+        required=True
     )
 
     #: (User, required):
@@ -117,7 +118,8 @@ class Claim(Id, UploadDatetime, CreateClaim):
     #: Resource unique identification
     resource_id = fields.UUID(
         description="UUID resource unique identification",
-        example=str(uuid.uuid4()), required=True, dump_only=True,
+        example="3ddd146f-c2c6-487e-ac40-df1dbb971b2c",
+        required=True, dump_only=True,
     )
 
     #: (User, required):
