@@ -247,7 +247,7 @@ class ResultFilter(Pagination, UploadFilter, Schema):
     #: Unique Identifier for result associated site
     site_id = fields.UUID(
         description="UUID site unique identification",
-        example="'86067ee9-5cb5-43e5-a361-568abe479fe2'",
+        example="86067ee9-5cb5-43e5-a361-568abe479fe2",
     )
 
     #: (Flavor.id):
