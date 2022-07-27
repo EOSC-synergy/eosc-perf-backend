@@ -43,7 +43,7 @@ def development_defaults(func):
     """
     @functools.wraps(func)
     def decorated(*args, dev_default=None, **kwargs):
-        if ENV == 'development' and dev_default:
+        if ENV == 'development' and dev_default is not None:
             kwargs['default'] = dev_default
         return func(*args, **kwargs)
     return decorated
@@ -154,43 +154,11 @@ TRUSTED_OP_LIST = list("TRUSTED_OP_LIST", default=[
 :meta hide-value:
 """
 
-FLAAT_CLIENT_ID = str("OIDC_CLIENT_ID", dev_default="not-defined")
-"""| OIDC Client Identifier valid at the Authorization Server.
-| See https://openid.net/specs/openid-connect-core-1_0.html
-
-| When ENV is set to `production`, a configuration value is required.
-| When ENV is set to `development`, the default value stands to: "not-defined".
-
-:meta hide-value:
-"""
-
-FLAAT_CLIENT_SECRET = str("OIDC_CLIENT_SECRET", default="", dev_default=".")
-"""| Secret to validate the application identify on the Authorization Server.
-| See https://openid.net/specs/openid-connect-core-1_0.html
-
-| When ENV is set to `production`, a configuration value is required.
-| When ENV is set to `development`, the default value stands to: ".".
-
-:meta hide-value:
-"""
-
-FLAAT_CLIENT_SECRET_FILE = str("OIDC_CLIENT_SECRET_FILE", default="")
-"""| Path to a secret file to define `OIDC_CLIENT_SECRET`.
-
-| The secret inside the file overwrites the environment SECRET_KEY therefore
-| the configuration requirement `OIDC_CLIENT_SECRET` does not apply.
-
-:meta hide-value:
-"""
-if FLAAT_CLIENT_SECRET_FILE:
-    FLAAT_CLIENT_SECRET = open(FLAAT_CLIENT_SECRET_FILE).read().rstrip('\n')
-if not FLAAT_CLIENT_SECRET:
-    raise EnvError("Environment variable 'OIDC_CLIENT_SECRET' empty")
-
-ADMIN_ENTITLEMENTS = list("ADMIN_ENTITLEMENTS", default=[])
+ADMIN_ENTITLEMENTS = list("ADMIN_ENTITLEMENTS", dev_default=[])
 """| OIDC Entitlements to grant administrator rights to users.
-| By default no entitlements are defined to grant administrator rights,
-  default=[].
+
+| When ENV is set to `production`, a configuration value is required.
+| When ENV is set to `development`, the default value stands to: [].
 
 :meta hide-value:
 """
