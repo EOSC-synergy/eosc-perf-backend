@@ -18,7 +18,8 @@ def is_admin(user_infos):
     else:
         entitlements = set()
     return all([
-        entitlements & set(current_app.config['ADMIN_ENTITLEMENTS']),
+        (entitlements & set(current_app.config['ADMIN_ENTITLEMENTS']) or
+         not current_app.config['ADMIN_ENTITLEMENTS']),
         is_registered(user_infos),
     ])
 

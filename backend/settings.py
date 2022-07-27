@@ -43,7 +43,7 @@ def development_defaults(func):
     """
     @functools.wraps(func)
     def decorated(*args, dev_default=None, **kwargs):
-        if ENV == 'development' and dev_default:
+        if ENV == 'development' and dev_default is not None:
             kwargs['default'] = dev_default
         return func(*args, **kwargs)
     return decorated
@@ -187,10 +187,11 @@ if FLAAT_CLIENT_SECRET_FILE:
 if not FLAAT_CLIENT_SECRET:
     raise EnvError("Environment variable 'OIDC_CLIENT_SECRET' empty")
 
-ADMIN_ENTITLEMENTS = list("ADMIN_ENTITLEMENTS", default=[])
+ADMIN_ENTITLEMENTS = list("ADMIN_ENTITLEMENTS", dev_default=[])
 """| OIDC Entitlements to grant administrator rights to users.
-| By default no entitlements are defined to grant administrator rights,
-  default=[].
+
+| When ENV is set to `production`, a configuration value is required.
+| When ENV is set to `development`, the default value stands to: [].
 
 :meta hide-value:
 """
