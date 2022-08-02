@@ -11,7 +11,7 @@ sys.path.append(cwd)
 from backend import create_app
 from backend.app import api
 
-app = create_app() 
+app = create_app()
 with open("api-spec.json", "w") as outfile:
     specs = api.spec.to_dict()
     specs["info"]["title"] = "Swagger client library generator specs"
@@ -25,4 +25,26 @@ with open("api-spec.json", "w") as outfile:
             "description": "Production server",
         },
     ]
+    # attempt setting a fixed order here, as the auto-generated one keeps changing
+    specs["components"]["schemas"]["Error"] = {
+        "type": "object",
+        "properties": {
+            "code": {
+                "type": "integer",
+                "description": "Error code"
+            },
+            "errors": {
+                "type": "object",
+                "description": "Errors"
+            },
+            "message": {
+                "type": "string",
+                "description": "Error message"
+            },
+            "status": {
+                "type": "string",
+                "description": "Error name"
+            }
+        }
+    }
     json.dump(specs, outfile, indent=4)
