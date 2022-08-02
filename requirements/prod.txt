@@ -1,7 +1,7 @@
 # Everything needed in production
 
 # Flask
-flask~=2.0
+flask~=2.1.0
 
 # Database
 flask-SQLAlchemy~=2.5.1
