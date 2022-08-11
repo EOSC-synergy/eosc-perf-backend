@@ -14,10 +14,11 @@ def manifest(imagerepo, tag):
         raise err  # Forward the exception, but reset registry
     finally:
         doia.set_registry(default_registry)
-    if status != 200:
-        raise Exception("Error: pulling manifest")
-    if status == 401:
+    if status == 200:
+        return manifest
+    elif status == 401:
         raise Exception("Error: not authorized")
-    if status == 404:
+    elif status == 404:
         raise Exception("Error: manifest not found")
-    return manifest
+    else:
+        raise Exception("Error: pulling manifest")
