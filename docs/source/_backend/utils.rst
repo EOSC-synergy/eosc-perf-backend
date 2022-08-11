@@ -6,10 +6,10 @@ Utils package
    :undoc-members:
    :show-inheritance:
 
-Dockerhub module
+Imagerepo module
 ----------------
 
-.. automodule:: backend.utils.dockerhub
+.. automodule:: backend.utils.imagerepo
    :members:
    :undoc-members:
    :show-inheritance:
