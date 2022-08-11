@@ -4,14 +4,17 @@ ARG INSTALL_PYTHON_VERSION=3.8
 ARG PYTHON_IMAGE_TAG=slim-buster
 FROM python:${INSTALL_PYTHON_VERSION}-${PYTHON_IMAGE_TAG} AS backend
 
+# Install system updates and tools
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
     postgresql \
     libpq-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
+ENV DEBIAN_FRONTEND=dialog
+WORKDIR /app
 
 RUN pip install --no-cache tox flake8 bandit
-
-WORKDIR /app
 
 ENV PATH="/home/sid/.local/bin:${PATH}"
 ENV FLASK_APP="autoapp.py"

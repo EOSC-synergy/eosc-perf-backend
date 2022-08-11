@@ -3,6 +3,16 @@ ARG INSTALL_PYTHON_VERSION=3.8
 ARG PYTHON_IMAGE_TAG=slim-buster
 FROM python:${INSTALL_PYTHON_VERSION}-${PYTHON_IMAGE_TAG} AS backend
 
+# Install system updates and tools
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+# Install system updates and tools
+        curl && \
+# Clean up & back to dialog front end
+    apt-get autoremove -y && \
+    apt-get clean -y && \
+    rm -rf /var/lib/apt/lists/*
+ENV DEBIAN_FRONTEND=dialog
 WORKDIR /app
 
 ENV PATH="/home/sid/.local/bin:${PATH}"
