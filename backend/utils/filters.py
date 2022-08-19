@@ -27,7 +27,7 @@ def new_filter(model, filter):
     elif operator == ">":
         return element > value
     elif operator == ">=":
-        return element <= value
+        return element >= value
     elif operator == "<=":
         return element <= value
     elif operator == "==":
