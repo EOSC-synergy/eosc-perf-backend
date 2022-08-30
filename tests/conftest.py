@@ -23,7 +23,8 @@ def sql_database(postgresql_proc):
     USER = postgresql_proc.user
     HOST = postgresql_proc.host
     PORT = postgresql_proc.port
-    with DatabaseJanitor(USER, HOST, PORT, TEST_DB, VERSION) as db:
+    PASS = "not-so-secret-for-testing"
+    with DatabaseJanitor(USER, HOST, PORT, TEST_DB, VERSION, PASS) as db:
         yield db
 
 
@@ -31,16 +32,14 @@ def sql_database(postgresql_proc):
 def session_environment(sql_database):
     """Patch fixture to set test env variables."""
     # Flask framework environments
-    os.environ['SECRET_KEY'] = 'not-so-secret-for-testing'
+    os.environ['SECRET_KEY'] = "not-so-secret-for-testing"
     # Database environments
     os.environ['DB_USER'] = str(sql_database.user)
-    os.environ['DB_PASSWORD'] = ""
+    os.environ['DB_PASSWORD'] = "not-so-secret-for-testing"
     os.environ['DB_HOST'] = str(sql_database.host)
     os.environ['DB_PORT'] = str(sql_database.port)
     os.environ['DB_NAME'] = str(sql_database.dbname)
     # OIDC environments
-    os.environ['OIDC_CLIENT_ID'] = "eosc-perf"
-    os.environ['OIDC_CLIENT_SECRET'] = "not-so-secret-for-testing"
     os.environ['ADMIN_ENTITLEMENTS'] = "admins"
     # Email and notification configuration.
     os.environ['MAIL_SUPPORT'] = "support@example.com"
