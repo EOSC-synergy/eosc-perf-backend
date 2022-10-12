@@ -90,7 +90,7 @@ DB_USER = str("DB_USER", dev_default="not-defined")
 :meta hide-value:
 """
 
-DB_PASSWORD = str("DB_PASSWORD", dev_default="not-defined")
+DB_PASSWORD = str("DB_PASSWORD", default="", dev_default="not-so-secret")
 """| Password to use on the database connection.
 
 | When ENV is set to `production`, a configuration value is required.
@@ -98,6 +98,19 @@ DB_PASSWORD = str("DB_PASSWORD", dev_default="not-defined")
 
 :meta hide-value:
 """
+
+DB_PASSWORD_FILE = str("DB_PASSWORD_FILE", default="")
+"""| Path to a secret file to define `DB_PASSWORD`.
+
+| The secret inside the file overwrites the environment DB_PASSWORD therefore
+| the configuration requirement `DB_PASSWORD` does not apply.
+
+:meta hide-value:
+"""
+if DB_PASSWORD_FILE:
+    DB_PASSWORD = open(DB_PASSWORD_FILE).read().rstrip('\n')
+if not DB_PASSWORD:
+    raise EnvError("Environment variable 'DB_PASSWORD' empty")
 
 DB_HOST = str("DB_HOST", dev_default="not-defined")
 """| Database host where to stablish the connection.
