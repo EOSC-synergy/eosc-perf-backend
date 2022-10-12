@@ -5,6 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
             "name": "Backend-development",
             "type": "python",
             "request": "launch",
@@ -12,6 +20,7 @@
             "args": [
                 "run"
             ],
+            "justMyCode": false,
             "cwd": "${workspaceFolder}",
             "env": {
                 // Overwrites .env
@@ -29,22 +38,12 @@
             "args": [
                 "run"
             ],
+            "justMyCode": true,
             "cwd": "${workspaceFolder}",
             "env": {
                 // Overwrites .env
                 "FLASK_ENV": "production",
             }
-        },
-        {
-            "name": "Python: Debug Tests",
-            "type": "python",
-            "request": "launch",
-            "program": "${file}",
-            "purpose": [
-                "debug-test"
-            ],
-            "console": "integratedTerminal",
-            "justMyCode": false
         },
         {
             "name": "Backend: Remote Attach",
