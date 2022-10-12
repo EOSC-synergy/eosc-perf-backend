@@ -40,6 +40,11 @@ from multiple providers or how to submit yours.
     /features/sites
     /features/tags
 
+.. note::
+    From version **1.2.0** benchmarks accept images out of docker-hub_.
+
+.. _docker-hub: https://hub.docker.com/
+
 
 Advanced features of EOSC Performance API
 -----------------------------------------
