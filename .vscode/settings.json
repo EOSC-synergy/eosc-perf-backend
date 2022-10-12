@@ -7,15 +7,16 @@
     ],
     "cSpell.words": [
         "autoapp",
+        "datefilter",
+        "filt",
+        "glist",
         "gunicorn",
+        "logfiles",
         "oidc",
+        "organisation",
         "pgdata",
         "postgres",
         "postgresql",
-        "logfiles",
-        "glist",
-        "filt",
-        "organisation",
         "rproxy"
     ],
 }

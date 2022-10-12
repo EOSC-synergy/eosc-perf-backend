@@ -4,9 +4,9 @@ See: https://pytest-flask.readthedocs.io/en/latest/features.html
 import logging
 import os
 
+import backend.utils.imagerepo as imagerepo
 import factories
 from backend import create_app, extensions
-from backend.utils import dockerhub
 from flaat.user_infos import UserInfos
 from pytest import fixture
 from pytest_postgresql.janitor import DatabaseJanitor
@@ -131,7 +131,7 @@ def grant_admin(monkeypatch):
 def mock_docker_registry(monkeypatch):
     """Patch fixture to test function with valid oidc token."""
     def always_true(*arg, **kwarg): return True
-    monkeypatch.setattr(dockerhub, "valid_image", always_true)
+    monkeypatch.setattr(imagerepo, "manifest", always_true)
 
 
 @fixture(scope='function')

@@ -1,6 +1,7 @@
 """Benchmark URL routes. Collection of controller methods to create and
 operate existing benchmarks on the database.
 """
+import backend.utils.imagerepo as imagerepo
 from flask_smorest import Blueprint, abort
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
@@ -79,9 +80,11 @@ def __create(body_args, user_infos):
     :rtype: :class:`models.Benchmark`
     """
     image, tag = body_args['docker_image'], body_args['docker_tag']
-    if not utils.dockerhub.valid_image(image, tag):
-        error_msg = f"Image {image}:{tag} not found in dockerhub"
-        abort(422, messages={'error': error_msg})
+    try:
+        imagerepo.manifest(image, tag)
+    except Exception as err:
+        error_msg = f"Could not validate container image: {err}"
+        abort(422, messages={'error': error_msg})        
 
     subiss = user_infos.subject, user_infos.issuer
     body_args['uploader'] = models.User.read(subiss)
@@ -204,9 +207,11 @@ def __update(body_args, benchmark_id):
     :raises UnprocessableEntity: Wrong query/body parameters
     """
     image, tag = body_args['docker_image'], body_args['docker_tag']
-    if not utils.dockerhub.valid_image(image, tag):
-        error_msg = f"Image {image}:{tag} not found in dockerhub"
-        abort(422, messages={'error': error_msg})
+    try:
+        imagerepo.manifest(image, tag)
+    except Exception as err:
+        error_msg = f"Could not validate container image: {err}"
+        abort(422, messages={'error': error_msg})        
 
     benchmark = __get(benchmark_id)
     benchmark.update(body_args)  # Only admins reach here
