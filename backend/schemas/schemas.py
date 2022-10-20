@@ -191,6 +191,14 @@ class CreateBenchmark(Schema):
         example="1.0.2-gpu", required=True,
     )
 
+    #: (Text, required):
+    #: URL to the benchmark container documentation 
+    url = fields.String(
+        description="String with a docker hub container tag",
+        example="https://hub.docker.com/r/deephdc/deep-oc-benchmarks_cnn",
+        required=True,
+    )
+
     #: (JSON, required):
     #: Schema used to validate benchmark results before upload
     json_schema = fields.Dict(

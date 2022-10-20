@@ -54,8 +54,10 @@ class TestCreate:
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize("body", indirect=True, argvalues=[
-        {"docker_image": "b1", "docker_tag": "v2.0", "json_schema": {"x": 1}},
+        {"docker_image": "b1", "docker_tag": "v2.0", "json_schema": {"x": 1},
+         "url": "https://my-new-benchmark.com"},
         {"docker_image": "b2", "docker_tag": "v2.0", "json_schema": {"x": 1},
+         "url": "https://my-new-benchmark.com",
          "description": "This is a long benchmark description"},
     ])
     def test_201(self, response_POST, url, body):
@@ -91,8 +93,10 @@ class TestCreate:
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize("body", indirect=True, argvalues=[
-        {"docker_image": "b1", "docker_tag": "v1.0", "json_schema": {"x": 1}},
-        {"docker_image": "b2", "docker_tag": "v1.0", "json_schema": {"x": 1}},
+        {"docker_image": "b1", "docker_tag": "v1.0", "json_schema": {"x": 1},
+         "url": "https://my-new-benchmark.com"},
+        {"docker_image": "b2", "docker_tag": "v1.0", "json_schema": {"x": 1},
+         "url": "https://my-new-benchmark.com"},
     ])
     @mark.filterwarnings("ignore:.*conflicts.*:sqlalchemy.exc.SAWarning")
     def test_409(self, response_POST):
@@ -183,6 +187,7 @@ class TestUpdate:
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize("body", indirect=True, argvalues=[
         {"docker_image": "new_name", "docker_tag": "v1.0",
+         "url": "https://my-new-benchmark.com",
          "json_schema": {"x": 2}},
     ])
     def test_204(self, body, response_PUT, benchmark):
@@ -215,6 +220,7 @@ class TestUpdate:
     @mark.parametrize("request_id", [uuid4()], indirect=True)
     @mark.parametrize("body", indirect=True, argvalues=[
         {"docker_image": "new_name", "docker_tag": "v1.0",
+         "url": "https://my-new-benchmark.com",
          "json_schema": {"x": 2}},
     ])
     def test_404(self, benchmark, response_PUT):
