@@ -37,6 +37,9 @@ class Benchmark(NeedsApprove, HasUploader, PkModel):
     name = column_property(docker_image + ":" + docker_tag)
 
     #: (JSON, required) Schema used to validate benchmark results before upload
+    url = Column(Text, nullable=False)
+
+    #: (JSON, required) Schema used to validate benchmark results before upload
     json_schema = Column(JSON, nullable=False)
 
     #: (Text) Short text describing the main benchmark features
