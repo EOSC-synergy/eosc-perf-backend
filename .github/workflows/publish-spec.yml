@@ -47,5 +47,6 @@ jobs:
         package_name: '@eosc-perf/eosc-perf-client'
         spec_file: api-spec.json
         repo_url: git+ssh://git@github.com/${{ github.repository }}.git
-        npm_token: ${{ secrets.GITHUB_TOKEN }}
+        npm_token: ${{ secrets.NPM_TOKEN }}
         snapshot: true
+        npm_registry: https://registry.npmjs.org
