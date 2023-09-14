@@ -40,11 +40,13 @@ jobs:
         name: API Specification
         path: api-spec.json
 
-    - run: mkdir -p ./eosc-perf-api-spec
-    
-    - name: Push api-spec.json to api spec repository
-      run: ../scripts/push-json-spec.sh eosc-perf-automation eosc-perf-api-spec "${message}" github.com "${GITHUB_REF_NAME}"
-      working-directory: ./eosc-perf-api-spec
-      env:
-        message: ${{ github.event.head_commit.message }}
-        GIT_TOKEN:  ${{secrets.AUTOMATED_CLIENT_TOKEN}} 
+    - name: Generate & publish client
+      uses: thechristophe/generate-esm-api-client@v1
+      with:
+        author: EOSC-Performance
+        package_name: '@eosc-perf/eosc-perf-client'
+        spec_file: api-spec.json
+        repo_url: git+ssh://git@github.com/${{ github.repository }}.git
+        npm_token: ${{ secrets.NPM_TOKEN }}
+        snapshot: true
+        npm_registry: https://registry.npmjs.org
