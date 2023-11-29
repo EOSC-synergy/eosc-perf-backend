@@ -1,4 +1,6 @@
-"""Users URL routes. Collection of controller methods to create and
+"""Routes for users.
+
+Users URL routes. Collection of controller methods to create and
 operate existing users on the database.
 """
 from flask_smorest import Blueprint, abort
@@ -28,7 +30,7 @@ resource_url = "/self"
 @queries.add_sorting(models.User)
 @queries.add_datefilter(models.User)
 def list(*args, **kwargs):
-    """(Admins) Filters and list users
+    """(Admins) Filter and list users.
 
     Use this method to get a list of users filtered according to your
     requirements. The response returns a pagination object with the
@@ -57,7 +59,7 @@ def __list(query_args):
 @flaat.inject_user_infos()
 @blp.response(201, schemas.User)
 def register(*args, **kwargs):
-    """(OIDC Token) Registers the logged in user
+    """(OIDC Token) Register the logged in user.
 
     Use this method to register yourself into the application. By using
     this method, you recognize that you have read and understood our
@@ -70,7 +72,7 @@ def register(*args, **kwargs):
 
 
 def __register(user_infos):
-    """Registers the current request user.
+    """Register the current request user.
 
     :raises Unauthorized: The server could not verify your identity
     :raises Forbidden: You are not registered
@@ -98,7 +100,7 @@ def __register(user_infos):
 @blp.arguments(args.UserDelete, location='query')
 @blp.response(204)
 def remove(*args, **kwargs):
-    """(Admins) Removes one or multiple users
+    """(Admins) Remove one or multiple users.
 
     Use this method to delete the users filtered according to your
     requirements. To prevent unintentionally delete all users, the
@@ -109,7 +111,7 @@ def remove(*args, **kwargs):
 
 
 def __remove(query_args):
-    """Removes/Deletes the filtered users.
+    """Remove/Delete the filtered users.
 
     :param query_args: The request query arguments as python dictionary
     :type query_args: dict
@@ -141,7 +143,7 @@ def __remove(query_args):
 @queries.add_sorting(models.User)
 @queries.add_datefilter(models.User)
 def search(*args, **kwargs):
-    """(Admins) Filters and list users
+    """(Admins) Filter and list users.
 
     Use this method to get a list of users based on a general search
     of terms. For example, calling this method with
@@ -176,7 +178,7 @@ def __search(query_args):
 @flaat.inject_user_infos()  # Fail if no valid authentication is provided
 @blp.response(200, schemas.User)
 def get(*args, **kwargs):
-    """(Users) Retrieves the logged in user info
+    """(Users) Retrieve the logged in user info.
 
     Use this method to retrieve your user data stored in the database.
     """
@@ -184,7 +186,7 @@ def get(*args, **kwargs):
 
 
 def __get(user_infos):
-    """Retrieves the current request user.
+    """Retrieve the current request user.
 
     :raises Unauthorized: The server could not verify your identity
     :raises Forbidden: You are not registered
@@ -205,7 +207,7 @@ def __get(user_infos):
 @flaat.inject_user_infos()
 @blp.response(204)
 def update(*args, **kwargs):
-    """(Users) Updates the logged in user info
+    """(Users) Update the logged in user info.
 
     Use this method to update your user data in the database. The method
     returns by default 204, use a GET method to retrieve the new status
@@ -215,7 +217,7 @@ def update(*args, **kwargs):
 
 
 def __update(user_infos):
-    """ Updates the user information from introspection endpoint.
+    """Update the user information from introspection endpoint.
 
     :raises Unauthorized: The server could not verify your identity
     :raises Forbidden: You are not registered
@@ -246,7 +248,7 @@ def __update(user_infos):
 @flaat.access_level("admin")
 @blp.response(204)
 def try_admin():
-    """(Admins) Returns 204 if you are admin
+    """(Admins) Return 204 if you are admin.
 
     Use this method to check that you have the administration rights.
     If so, the access returns 204, otherwise 401 or 403 are expected.
@@ -268,7 +270,7 @@ def try_admin():
 @queries.add_sorting(models.Result)
 @queries.add_datefilter(models.Result)
 def results(*args, **kwargs):
-    """(Users) Returns your uploaded results
+    """(Users) Return your uploaded results.
 
     Use this method to retrieve all the results uploaded by your user.
     You can use the query parameter to retrieve also those with pending
@@ -278,7 +280,7 @@ def results(*args, **kwargs):
 
 
 def __results(query_args, user_infos):
-    """Returns the user uploaded results filtered by the query args.
+    """Return the user uploaded results filtered by the query args.
 
     :raises Unauthorized: The server could not verify your identity
     :raises Forbidden: You don't have the administrator rights
@@ -298,7 +300,7 @@ def __results(query_args, user_infos):
 @queries.add_sorting(models.Claim)
 @queries.add_datefilter(models.Claim)
 def claims(*args, **kwargs):
-    """(Users) Returns your uploaded pending claims
+    """(Users) Return your uploaded pending claims.
 
     Use this method to retrieve all the claims uploaded by your user.
     """
@@ -306,7 +308,7 @@ def claims(*args, **kwargs):
 
 
 def __claims(query_args, user_infos):
-    """Returns the user uploaded claims filtered by the query args.
+    """Return the user uploaded claims filtered by the query args.
 
     :raises Unauthorized: The server could not verify your identity
     :raises Forbidden: You don't have the administrator rights

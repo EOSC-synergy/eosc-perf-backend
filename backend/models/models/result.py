@@ -17,13 +17,16 @@ from .user import HasUploader
 
 
 class Result(HasClaims, HasTags, HasUploader, PkModel):
-    """The Result model represents the results of the execution of a
+    """Result model.
+
+    The Result model represents the results of the execution of a
     specific Benchmark on a specific Site and Flavor.
 
     They carry the JSON data output by the executed benchmarks.
 
     **Properties**:
     """
+
     #: (JSON, required) Benchmark execution results
     json = Column(JSONB, nullable=False)
 
@@ -76,7 +79,9 @@ class Result(HasClaims, HasTags, HasUploader, PkModel):
     )
 
     def __init__(self, site=None, site_id=None, **properties):
-        """Validates the result passes the benchmark JSON Schema and sets
+        """Class initialization.
+
+        Validates the result passes the benchmark JSON Schema and sets
         default reports to empty list.
         """
         benchmark, json = properties['benchmark'], properties['json']
@@ -93,5 +98,5 @@ class Result(HasClaims, HasTags, HasUploader, PkModel):
         super().__init__(**properties)
 
     def __repr__(self) -> str:
-        """Human-readable representation string"""
+        """Human-readable representation string."""
         return "<{} {}>".format(self.__class__.__name__, self.json)

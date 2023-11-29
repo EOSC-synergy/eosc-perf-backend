@@ -1,12 +1,15 @@
-"""Benchmark URL routes. Collection of controller methods to create and
+"""Routes for benchmarks.
+
+Benchmark URL routes. Collection of controller methods to create and
 operate existing benchmarks on the database.
 """
-import backend.utils.imagerepo as imagerepo
 from flask_smorest import Blueprint, abort
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 
-from .. import models, notifications, utils
+import backend.utils.imagerepo as imagerepo
+
+from .. import models, notifications
 from ..extensions import db, flaat
 from ..schemas import args, schemas
 from ..utils import queries
@@ -27,7 +30,7 @@ resource_url = "/<uuid:benchmark_id>"
 @queries.add_sorting(models.Benchmark)
 @queries.add_datefilter(models.Benchmark)
 def list(*args, **kwargs):
-    """(Public) Filters and list benchmarks
+    """(Public) Filter and list benchmarks.
 
     Use this method to get a list of benchmarks filtered according to your
     requirements. The response returns a pagination object with the
@@ -37,7 +40,7 @@ def list(*args, **kwargs):
 
 
 def __list(query_args):
-    """Returns a list of filtered benchmarks.
+    """Return a list of filtered benchmarks.
 
     :param query_args: The request query arguments as python dictionary
     :type query_args: dict
@@ -56,7 +59,7 @@ def __list(query_args):
 @blp.arguments(schemas.CreateBenchmark)
 @blp.response(201, schemas.Benchmark)
 def create(*args, **kwargs):
-    """(Users) Uploads a new benchmark
+    """(Users) Upload a new benchmark.
 
     Use this method to create a new benchmarks in the database so it can
     be accessed by the application users. The method returns the complete
@@ -68,7 +71,7 @@ def create(*args, **kwargs):
 
 
 def __create(body_args, user_infos):
-    """Creates a new benchmark in the database.
+    """Create a new benchmark in the database.
 
     :param body_args: The request body arguments as python dictionary
     :type body_args: dict
@@ -82,9 +85,9 @@ def __create(body_args, user_infos):
     image, tag = body_args['docker_image'], body_args['docker_tag']
     try:
         imagerepo.manifest(image, tag)
-    except Exception as err:
+    except Exception as err:  # noqa B902
         error_msg = f"Could not validate container image: {err}"
-        abort(422, messages={'error': error_msg})        
+        abort(422, messages={'error': error_msg})
 
     subiss = user_infos.subject, user_infos.issuer
     body_args['uploader'] = models.User.read(subiss)
@@ -108,7 +111,7 @@ def __create(body_args, user_infos):
 @queries.add_sorting(models.Benchmark)
 @queries.add_datefilter(models.Benchmark)
 def search(*args, **kwargs):
-    """(Public) Filters and list benchmarks
+    """(Public) Filter and list benchmarks.
 
     Use this method to get a list of benchmarks based on a general search
     of terms. For example, calling this method with terms=v1&terms=0
@@ -120,7 +123,7 @@ def search(*args, **kwargs):
 
 
 def __search(query_args):
-    """Filters and list benchmarks using generic terms.
+    """Filter and list benchmarks using generic terms.
 
     Use this method to get a list of benchmarks based on a general search
     of terms. For example, calling this method with terms=v1&terms=0
@@ -151,7 +154,7 @@ def __search(query_args):
 @blp.arguments(args.Schema(), location='query', as_kwargs=True)
 @blp.response(200, schemas.Benchmark)
 def get(*args, **kwargs):
-    """(Public) Retrieves benchmark details
+    """(Public) Retrieve benchmark details.
 
     Use this method to retrieve a specific benchmark from the database.
     """
@@ -159,7 +162,7 @@ def get(*args, **kwargs):
 
 
 def __get(benchmark_id):
-    """Returns the id matching benchmark.
+    """Return the id matching benchmark.
 
     If no benchmark exists with the indicated id, then 404 NotFound
     exception is raised.
@@ -184,7 +187,7 @@ def __get(benchmark_id):
 @blp.arguments(schemas.Benchmark)
 @blp.response(204)
 def update(*args, **kwargs):
-    """ (Admins) Implements JSON Put for benchmarks
+    """(Admins) Implement JSON Put for benchmarks.
 
     Use this method to update a specific benchmark from the database.
     """
@@ -192,7 +195,7 @@ def update(*args, **kwargs):
 
 
 def __update(body_args, benchmark_id):
-    """Updates a benchmark specific fields.
+    """Update a benchmark specific fields.
 
     If no benchmark exists with the indicated id, then 404 NotFound
     exception is raised.
@@ -209,9 +212,9 @@ def __update(body_args, benchmark_id):
     image, tag = body_args['docker_image'], body_args['docker_tag']
     try:
         imagerepo.manifest(image, tag)
-    except Exception as err:
+    except Exception as err:  # noqa B902
         error_msg = f"Could not validate container image: {err}"
-        abort(422, messages={'error': error_msg})        
+        abort(422, messages={'error': error_msg})
 
     benchmark = __get(benchmark_id)
     benchmark.update(body_args)  # Only admins reach here
@@ -229,7 +232,7 @@ def __update(body_args, benchmark_id):
 @blp.arguments(args.Schema(), location='query', as_kwargs=True)
 @blp.response(204)
 def delete(*args, **kwargs):
-    """(Admins) Deletes an existing benchmark
+    """(Admins) Delete an existing benchmark.
 
     Use this method to delete a specific benchmark from the database.
     """
@@ -237,7 +240,7 @@ def delete(*args, **kwargs):
 
 
 def __delete(benchmark_id):
-    """Deletes the id matching benchmark.
+    """Delete the id matching benchmark.
 
     If no benchmark exists with the indicated id, then 404 NotFound
     exception is raised.
@@ -264,7 +267,7 @@ def __delete(benchmark_id):
 @blp.arguments(args.Schema(), location='query', as_kwargs=True)
 @blp.response(204)
 def approve(*args, **kwargs):
-    """(Admins) Approves a benchmark to include it on default list methods
+    """(Admins) Approve a benchmark to include it on default list methods.
 
     Use this method to approve an specific benchmark submitted by an user.
     It is a custom method, as side effect, it removes the submit report
@@ -274,7 +277,7 @@ def approve(*args, **kwargs):
 
 
 def __approve(benchmark_id):
-    """Approves a benchmark to include it on default list methods.
+    """Approve a benchmark to include it on default list methods.
 
     :param benchmark_id: The id of the benchmark to approve
     :type benchmark_id: uuid
@@ -305,7 +308,7 @@ def __approve(benchmark_id):
 @blp.arguments(args.Schema(), location='query', as_kwargs=True)
 @blp.response(204)
 def reject(*args, **kwargs):
-    """(Admins) Rejects a benchmark to safe delete it.
+    """(Admins) Reject a benchmark to safe delete it.
 
     Use this method instead of DELETE as it raises 422 in case the
     resource was already approved.
@@ -317,7 +320,8 @@ def reject(*args, **kwargs):
 
 
 def __reject(benchmark_id):
-    """Rejects a benchmark to safe delete it.
+    """Reject a benchmark to safe delete it.
+
     :param benchmark_id: The id of the benchmark to reject
     :type benchmark_id: uuid
     :raises Unauthorized: The server could not verify the user identity

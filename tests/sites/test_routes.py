@@ -1,10 +1,11 @@
 """Functional tests using pytest-flask."""
 from uuid import uuid4
 
-from backend import models
-from backend.schemas import schemas
 from flask import url_for
 from pytest import fixture, mark
+
+from backend import models
+from backend.schemas import schemas
 from tests import asserts
 from tests.db_instances import flavors, sites, users
 
@@ -17,6 +18,7 @@ def url(endpoint, request_id, query):
 
 @mark.parametrize("endpoint", ["sites.list"], indirect=True)
 class TestList:
+    """Test sites list endpoint."""
 
     @mark.parametrize("query", indirect=True, argvalues=[
         {"name": sites[0]["name"], "address": sites[0]["address"]},
@@ -26,7 +28,7 @@ class TestList:
         {"sort_by": "+upload_datetime"},
         {"sort_by": "+id"},
     ])
-    def test_200(self, response_GET, url):
+    def test_200(self, response_GET, url):  # noqa N803
         """GET method succeeded 200."""
         assert response_GET.status_code == 200
         asserts.match_pagination(response_GET.json, url)
@@ -41,13 +43,14 @@ class TestList:
         {"bad_key": "This is a non expected query key"},
         {"sort_by": "Bad sort command"},
     ])
-    def test_422(self, response_GET):
+    def test_422(self, response_GET):  # noqa N803
         """GET method fails 422 if bad request body."""
         assert response_GET.status_code == 422
 
 
 @mark.parametrize("endpoint", ["sites.create"], indirect=True)
 class TestCreate:
+    """Test sites create endpoint."""
 
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
@@ -55,7 +58,7 @@ class TestCreate:
         {"name": "s3", "address": "addr3", "description": "Text"},
         {"name": "s4", "address": "addr4"},
     ])
-    def test_201(self, response_POST, url, body):
+    def test_201(self, response_POST, url, body):  # noqa N803
         """POST method succeeded 201."""
         assert response_POST.status_code == 201
         asserts.match_query(response_POST.json, url)
@@ -70,7 +73,7 @@ class TestCreate:
         {"name": "s3", "address": "addr2", "description": "Text"},
         {},  # Empty body
     ])
-    def test_401(self, response_POST):
+    def test_401(self, response_POST):  # noqa N803
         """POST method fails 401 if not authorized."""
         assert response_POST.status_code == 401
 
@@ -79,7 +82,7 @@ class TestCreate:
     @mark.parametrize("body", indirect=True, argvalues=[
         {"name": "s3", "address": "addr2", "description": "Text"},
     ])
-    def test_403(self, response_POST):
+    def test_403(self, response_POST):  # noqa N803
         """POST method fails 403 if user not registered."""
         assert response_POST.status_code == 403
 
@@ -88,7 +91,7 @@ class TestCreate:
     @mark.parametrize("body", indirect=True, argvalues=[
         {"name": sites[0]["name"], "address": sites[0]["address"]},
     ])
-    def test_409(self, response_POST):
+    def test_409(self, response_POST):  # noqa N803
         """POST method fails 409 if resource already exists."""
         assert response_POST.status_code == 409
 
@@ -99,13 +102,14 @@ class TestCreate:
         {"address": "new-address"},  # Missingname
         {},  # Empty body
     ])
-    def test_422(self, response_POST):
+    def test_422(self, response_POST):  # noqa N803
         """POST method fails 422 if missing required."""
         assert response_POST.status_code == 422
 
 
 @mark.parametrize("endpoint", ["sites.search"], indirect=True)
 class TestSearch:
+    """Test sites search endpoint."""
 
     @mark.parametrize("query", indirect=True, argvalues=[
         {"terms": [sites[0]["name"]]},
@@ -122,7 +126,7 @@ class TestSearch:
         {"sort_by": "+upload_datetime"},
         {"sort_by": "+id"},
     ])
-    def test_200(self, response_GET, url):
+    def test_200(self, response_GET, url):  # noqa N803
         """GET method succeeded 200."""
         assert response_GET.status_code == 200
         asserts.match_pagination(response_GET.json, url)
@@ -137,7 +141,7 @@ class TestSearch:
         {"bad_key": "This is a non expected query key"},
         {"sort_by": "Bad sort command"},
     ])
-    def test_422(self, response_GET):
+    def test_422(self, response_GET):  # noqa N803
         """GET method fails 422 if bad request body."""
         assert response_GET.status_code == 422
 
@@ -147,14 +151,15 @@ class TestSearch:
     sites[1]["id"],
 ])
 class TestGet:
+    """Test sites get endpoint."""
 
-    def test_200(self, site, response_GET):
+    def test_200(self, site, response_GET):  # noqa N803
         """GET method succeeded 200."""
         assert response_GET.status_code == 200
         asserts.match_site(response_GET.json, site)
 
     @mark.parametrize("request_id", [uuid4()], indirect=True)
-    def test_404(self, response_GET):
+    def test_404(self, response_GET):  # noqa N803
         """GET method fails 404 if no id found."""
         assert response_GET.status_code == 404
 
@@ -164,6 +169,7 @@ class TestGet:
     sites[1]["id"],
 ])
 class TestUpdate:
+    """Test sites update endpoint."""
 
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
@@ -171,7 +177,7 @@ class TestUpdate:
     @mark.parametrize("body", indirect=True, argvalues=[
         {"name": "new_name1", "address": "addr1"},
     ])
-    def test_204(self, body, response_PUT, site):
+    def test_204(self, body, response_PUT, site):  # noqa N803
         """PUT method succeeded 204."""
         assert response_PUT.status_code == 204
         json = schemas.Site().dump(site)
@@ -182,7 +188,7 @@ class TestUpdate:
     @mark.parametrize("body", indirect=True, argvalues=[
         {"name": "new_name", "address": "new_addr"},
     ])
-    def test_401(self, site, response_PUT):
+    def test_401(self, site, response_PUT):  # noqa N803
         """PUT method fails 401 if not authorized."""
         assert response_PUT.status_code == 401
         assert site == models.Site.query.get(site.id)
@@ -192,7 +198,7 @@ class TestUpdate:
     @mark.parametrize("body", indirect=True, argvalues=[
         {"name": "new_name", "address": "new_addr"},
     ])
-    def test_403(self, site, response_PUT):
+    def test_403(self, site, response_PUT):  # noqa N803
         """PUT method fails 403 if user not registered."""
         assert response_PUT.status_code == 403
         assert site == models.Site.query.get(site.id)
@@ -204,7 +210,7 @@ class TestUpdate:
     @mark.parametrize("body", indirect=True, argvalues=[
         {"name": "new_name", "address": "new_addr"},
     ])
-    def test_404(self, site, response_PUT):
+    def test_404(self, site, response_PUT):  # noqa N803
         """PUT method fails 404 if no id found."""
         assert response_PUT.status_code == 404
         assert site == models.Site.query.get(site.id)
@@ -215,7 +221,7 @@ class TestUpdate:
     @mark.parametrize("body", indirect=True, argvalues=[
         {"bad_field": ""},
     ])
-    def test_422(self, site, response_PUT):
+    def test_422(self, site, response_PUT):  # noqa N803
         """PUT method fails 422 if bad request body."""
         assert response_PUT.status_code == 422
         assert site == models.Site.query.get(site.id)
@@ -226,11 +232,12 @@ class TestUpdate:
     sites[1]["id"],
 ])
 class TestDelete:
+    """Test sites delete endpoint."""
 
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
-    def test_204(self, site, response_DELETE):
+    def test_204(self, site, response_DELETE):  # noqa N803
         """DELETE method succeeded 204."""
         assert response_DELETE.status_code == 204
         assert models.Site.query.get(site.id) is None
@@ -239,7 +246,7 @@ class TestDelete:
 
     @mark.parametrize("token_sub", [None], indirect=True)
     @mark.parametrize("token_iss", [None], indirect=True)
-    def test_401(self, site, response_DELETE):
+    def test_401(self, site, response_DELETE):  # noqa N803
         """DELETE method fails 401 if not authorized."""
         assert response_DELETE.status_code == 401
         assert models.Site.query.get(site.id) is not None
@@ -248,7 +255,7 @@ class TestDelete:
 
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
-    def test_403(self, site, response_DELETE):
+    def test_403(self, site, response_DELETE):  # noqa N803
         """DELETE method fails 403 if forbidden."""
         assert response_DELETE.status_code == 403
         assert models.Site.query.get(site.id) is not None
@@ -259,7 +266,7 @@ class TestDelete:
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize("request_id", [uuid4()], indirect=True)
-    def test_404(self, site, response_DELETE):
+    def test_404(self, site, response_DELETE):  # noqa N803
         """DELETE method fails 404 if no id found."""
         assert response_DELETE.status_code == 404
         assert models.Site.query.get(site.id) is not None
@@ -272,25 +279,26 @@ class TestDelete:
     sites[2]["id"],
 ])
 class TestApprove:
+    """Test sites approve endpoint."""
 
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
-    def test_204(self, response_POST, site):
+    def test_204(self, response_POST, site):  # noqa N803
         """POST method succeeded 200."""
         assert response_POST.status_code == 204
         assert site.status.name == "approved"
 
     @mark.parametrize("token_sub", [None], indirect=True)
     @mark.parametrize("token_iss", [None], indirect=True)
-    def test_401(self, response_POST, site):
+    def test_401(self, response_POST, site):  # noqa N803
         """POST method fails 401 if not authorized."""
         assert response_POST.status_code == 401
         assert site.status.name == "on_review"
 
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
-    def test_403(self, response_POST, site):
+    def test_403(self, response_POST, site):  # noqa N803
         """POST method fails 403 if method forbidden."""
         assert response_POST.status_code == 403
         assert site.status.name == "on_review"
@@ -299,7 +307,7 @@ class TestApprove:
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize("request_id", [uuid4()], indirect=True)
-    def test_404(self, response_POST, site):
+    def test_404(self, response_POST, site):  # noqa N803
         """POST method fails 404 if no id found."""
         assert response_POST.status_code == 404
         assert site.status.name == "on_review"
@@ -310,25 +318,26 @@ class TestApprove:
     sites[2]["id"],
 ])
 class TestReject:
+    """Test sites reject endpoint."""
 
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
-    def test_204(self, response_POST, site):
+    def test_204(self, response_POST, site):  # noqa N803
         """POST method succeeded 200."""
         assert response_POST.status_code == 204
         assert site is None
 
     @mark.parametrize("token_sub", [None], indirect=True)
     @mark.parametrize("token_iss", [None], indirect=True)
-    def test_401(self, response_POST, site):
+    def test_401(self, response_POST, site):  # noqa N803
         """POST method fails 401 if not authorized."""
         assert response_POST.status_code == 401
         assert site.status.name == "on_review"
 
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
-    def test_403(self, response_POST, site):
+    def test_403(self, response_POST, site):  # noqa N803
         """POST method fails 403 if method forbidden."""
         assert response_POST.status_code == 403
         assert site.status.name == "on_review"
@@ -337,7 +346,7 @@ class TestReject:
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
     @mark.parametrize("request_id", [uuid4()], indirect=True)
-    def test_404(self, response_POST, site):
+    def test_404(self, response_POST, site):  # noqa N803
         """POST method fails 404 if no id found."""
         assert response_POST.status_code == 404
         assert site.status.name == "on_review"
@@ -346,6 +355,7 @@ class TestReject:
 @mark.parametrize("endpoint", ["sites.list_flavors"], indirect=True)
 @mark.parametrize("site_id", indirect=True, argvalues=[sites[0]["id"]])
 class TestListFlavors:
+    """Test sites list flavors endpoint."""
 
     @mark.parametrize("query", indirect=True, argvalues=[
         {"name": flavors[0]["name"]},
@@ -357,7 +367,7 @@ class TestListFlavors:
         {"sort_by": "+upload_datetime"},
         {"sort_by": "+id"},
     ])
-    def test_200(self, response_GET, url):
+    def test_200(self, response_GET, url):  # noqa N803
         """GET method succeeded 200."""
         assert response_GET.status_code == 200
         asserts.match_pagination(response_GET.json, url)
@@ -372,7 +382,7 @@ class TestListFlavors:
         {"bad_key": "This is a non expected query key"},
         {"sort_by": "Bad sort command"},
     ])
-    def test_422(self, response_GET):
+    def test_422(self, response_GET):  # noqa N803
         """GET method fails 422 if bad request body."""
         assert response_GET.status_code == 422
 
@@ -382,6 +392,7 @@ class TestListFlavors:
     sites[0]["id"],
 ])
 class TestCreateFlavor:
+    """Test sites create flavor endpoint."""
 
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
     @mark.parametrize("token_iss", [users[0]["iss"]], indirect=True)
@@ -389,7 +400,7 @@ class TestCreateFlavor:
         {"name": "flavorN", "description": "FlavorN for siteX"},
         {"name": "flavorN"},
     ])
-    def test_201(self, response_POST, site, url, body):
+    def test_201(self, response_POST, site, url, body):  # noqa N803
         """POST method succeeded 201."""
         assert response_POST.status_code == 201
         asserts.match_query(response_POST.json, url)
@@ -405,7 +416,7 @@ class TestCreateFlavor:
         {"name": "flavorN", "description": "FlavorN for siteX"},
         {},  # Empty body
     ])
-    def test_401(self, response_POST):
+    def test_401(self, response_POST):  # noqa N803
         """POST method fails 401 if not authorized."""
         assert response_POST.status_code == 401
 
@@ -414,7 +425,7 @@ class TestCreateFlavor:
     @mark.parametrize("body", indirect=True, argvalues=[
         {"name": "flavorN", "description": "FlavorN for siteX"},
     ])
-    def test_403(self, response_POST):
+    def test_403(self, response_POST):  # noqa N803
         """POST method fails 403 if user not registered."""
         assert response_POST.status_code == 403
 
@@ -424,7 +435,7 @@ class TestCreateFlavor:
     @mark.parametrize("body", indirect=True, argvalues=[
         {"name": "flavorN", "description": "FlavorN for siteX"},
     ])
-    def test_404(self, response_POST):
+    def test_404(self, response_POST):  # noqa N803
         """POST method fails 404 if no id found."""
         assert response_POST.status_code == 404
 
@@ -433,7 +444,7 @@ class TestCreateFlavor:
     @mark.parametrize("body", indirect=True, argvalues=[
         {"name": flavors[0]["name"]},
     ])
-    def test_409(self, response_POST):
+    def test_409(self, response_POST):  # noqa N803
         """POST method fails 409 if resource already exists."""
         assert response_POST.status_code == 409
 
@@ -443,7 +454,7 @@ class TestCreateFlavor:
         {"description": "New flavor for site"},
         {},  # Empty body
     ])
-    def test_422(self, response_POST):
+    def test_422(self, response_POST):  # noqa N803
         """POST method fails 422 if missing required."""
         assert response_POST.status_code == 422
 
@@ -453,6 +464,7 @@ class TestCreateFlavor:
     sites[0]["id"],
 ])
 class TestSearchFlavors:
+    """Test sites search flavors endpoint."""
 
     @mark.parametrize("query", indirect=True, argvalues=[
         {"terms": [flavors[0]["name"]]},
@@ -467,7 +479,7 @@ class TestSearchFlavors:
         {"sort_by": "+upload_datetime"},
         {"sort_by": "+id"},
     ])
-    def test_200(self, response_GET, url):
+    def test_200(self, response_GET, url):  # noqa N803
         """GET method succeeded 200."""
         assert response_GET.status_code == 200
         asserts.match_pagination(response_GET.json, url)
@@ -482,6 +494,6 @@ class TestSearchFlavors:
         {"bad_key": "This is a non expected query key"},
         {"sort_by": "Bad sort command"},
     ])
-    def test_422(self, response_GET):
+    def test_422(self, response_GET):  # noqa N803
         """GET method fails 422 if bad request body."""
         assert response_GET.status_code == 422

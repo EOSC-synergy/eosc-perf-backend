@@ -1,7 +1,8 @@
-"""Backend package for schemas definition. This module is based on the
-group of python framework **marshmallow**, an ORM/ODM/framework-agnostic
-library for converting complex datatypes, such as objects, to and from
-native Python datatypes.
+"""Backend package for schemas definition.
+
+This module is based on the group of python framework **marshmallow**,
+an ORM/ODM/framework-agnostic library for converting complex datatypes,
+such as objects, to and from native Python datatypes.
 
 Combined with the flask extension flask_smorest, it allows to generate
 the OpenAPI specification schemas based on python class objects.
@@ -10,7 +11,7 @@ This objects come into 2 types:
  - Schemas: JSON structures used to operate model instances
  - Arguments: Query arguments to control route method parameters
 """
-from marshmallow import Schema, fields, pre_load, post_dump
+from marshmallow import Schema, fields, post_dump, pre_load
 from marshmallow.validate import OneOf, Range
 from werkzeug.datastructures import ImmutableMultiDict
 
@@ -19,13 +20,14 @@ from ..models.models.reports.submit import ResourceStatus
 
 class BaseSchema(Schema):
     """Base schema to control common schema features."""
-    class Meta:
-        """`marshmallow` options object for BaseSchema."""
+
+    class Meta:  # noqa: D106
         #: Enforce Order in OpenAPI Specification File
         ordered = True
 
     @pre_load   # Support PHP and axios query framework
     def process_input(self, data, **kwargs):
+        """Process input data to remove [] from arrays."""
         if hasattr(data, 'data'):  # flask_smorest query
             args = data.data._iter_hashitems()
             fixed_args = [(x.replace('[]', ''), y) for x, y in args]
@@ -34,6 +36,7 @@ class BaseSchema(Schema):
 
     @post_dump
     def remove_skip_values(self, data, **kwargs):
+        """Remove None values from the output."""
         return {
             key: value for key, value in data.items()
             if value is not None
@@ -41,7 +44,7 @@ class BaseSchema(Schema):
 
 
 class Pagination(Schema):
-    """Pagination schema to limit the amount of results provided by a method"""
+    """Pagination to limit the amount of results provided by a method."""
 
     #: (Bool, required, dump_only):
     #: True if a next page exists.
@@ -101,6 +104,7 @@ class Pagination(Schema):
 
 
 class Id(Schema):
+    """Id schema."""
 
     #: (UUID, required, dump_only):
     #: Primary key with an Unique Identifier for the model instance
@@ -112,6 +116,7 @@ class Id(Schema):
 
 
 class Status(Schema):
+    """Status schema."""
 
     #: (Str):
     #: Resource current state (approved, on_review, etc.)
@@ -123,6 +128,7 @@ class Status(Schema):
 
 
 class Search(Schema):
+    """Search schema."""
 
     #: ([Text]):
     #: Group of strings to use as general search on model instances
@@ -144,6 +150,7 @@ class Search(Schema):
 
 
 class UploadDatetime(Schema):
+    """Upload date time schema."""
 
     #: (ISO8601):
     #: Upload datetime of the model instance
@@ -155,6 +162,7 @@ class UploadDatetime(Schema):
 
 
 class UploadFilter(Schema):
+    """Upload filter schema."""
 
     #: (ISO8601, attribute="upload_datetime"):
     #: Upload datetime of the instance before a specific date

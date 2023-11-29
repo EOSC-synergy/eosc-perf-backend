@@ -1,11 +1,11 @@
-"""Function asserts for tests"""
+"""Function asserts for tests."""
 from urllib import parse
 
 from backend.extensions import mail
 
 
 def match_pagination(json, url):
-    """Checks the json is a pagination object."""
+    """Check the json is a pagination object."""
     parsed_url = parse.urlparse(url)
     query_param = parse.parse_qs(parsed_url.query)
 
@@ -27,8 +27,7 @@ def match_pagination(json, url):
 
 
 def match_benchmark(json, benchmark):
-    """Checks the json db_instances matches the benchmark object."""
-
+    """Check the json db_instances matches the benchmark object."""
     # Check the benchmark has an id
     assert 'id' in json and type(json['id']) is str
     assert json['id'] == str(benchmark.id)
@@ -54,8 +53,7 @@ def match_benchmark(json, benchmark):
 
 
 def match_submit(json):
-    """Checks the json db_instances matches the submit object."""
-
+    """Check the json db_instances matches the submit object."""
     # Check the report has an id
     assert 'id' not in json
 
@@ -76,8 +74,7 @@ def match_submit(json):
 
 
 def match_claim(json, claim):
-    """Checks the json db_instances matches the claim object."""
-
+    """Check the json db_instances matches the claim object."""
     # Check the report has an id
     assert 'id' in json and type(json['id']) is str
     assert json['id'] == str(claim.id)
@@ -108,8 +105,7 @@ def match_claim(json, claim):
 
 
 def match_site(json, site):
-    """Checks the json db_instances matches the site object."""
-
+    """Check the json db_instances matches the site object."""
     # Check the site has id
     assert 'id' in json and type(json['id']) is str
     assert json['id'] == str(site.id)
@@ -131,8 +127,7 @@ def match_site(json, site):
 
 
 def match_flavor(json, flavor):
-    """Checks the json db_instances matches the flavor object."""
-
+    """Check the json db_instances matches the flavor object."""
     # Check the flavor has id
     assert 'id' in json and type(json['id']) is str
     assert json['id'] == str(flavor.id)
@@ -150,8 +145,7 @@ def match_flavor(json, flavor):
 
 
 def match_tag(json, tag):
-    """Checks the json tag contains the correct attributes."""
-
+    """Check the json tag contains the correct attributes."""
     # Check the tag has an id
     assert 'id' in json and type(json['id']) is str
     assert json['id'] == str(tag.id)
@@ -169,8 +163,7 @@ def match_tag(json, tag):
 
 
 def match_user(json, user):
-    """Checks the json db_instances matches the user object."""
-
+    """Check the json db_instances matches the user object."""
     # Check the user has subject
     assert 'sub' in json and type(json['sub']) is str
     assert json['sub'] == user.sub
@@ -187,8 +180,7 @@ def match_user(json, user):
 
 
 def match_result(json, result):
-    """Checks the json db_instances matches the result object."""
-
+    """Check the json db_instances matches the result object."""
     # Check the result has an id
     assert 'id' in json and type(json['id']) is str
     assert json['id'] == str(result.id)
@@ -230,7 +222,7 @@ def match_result(json, result):
 
 
 def match_query(json, url):
-    """Checks the json db_instances matches the url query."""
+    """Check the json db_instances matches the url query."""
     parsed_url = parse.urlparse(url)
     query_param = parse.parse_qs(parsed_url.query)
 
@@ -354,7 +346,7 @@ def match_query(json, url):
 
 
 def match_body(json, body):
-    """Checks the json db_instances matches the body dict."""
+    """Check the json db_instances matches the body dict."""
     for k in body:
         assert k in json
         if type(body[k]) is dict:
@@ -371,8 +363,7 @@ def match_body(json, body):
 
 
 def match_edit(json, body):
-    """Checks the json edit response matches the request body."""
-
+    """Check the json edit response matches the request body."""
     # Check the benchmark matches the request
     if 'benchmark_id' in body:
         assert json['benchmark']['id'] == str(body['benchmark_id'])
@@ -395,7 +386,7 @@ def match_edit(json, body):
 
 
 def submit_notification(report):
-    """Checks a report notification is in the outbox"""
+    """Check a report notification is in the outbox."""
     mail_outbox = mail.get_connection().mailman.outbox
 
     def filter(item):
@@ -411,7 +402,7 @@ def submit_notification(report):
 
 
 def user_welcome(user):
-    """Checks a user welcome is in the outbox"""
+    """Check a user welcome is in the outbox."""
     mail_outbox = mail.get_connection().mailman.outbox
 
     def filter(item):
@@ -425,6 +416,7 @@ def user_welcome(user):
 
 
 def pop_notification(mail_outbox, filter):
+    """Pop notification from outbox."""
     for index, item in enumerate(mail_outbox):
         if filter(item):
             return mail_outbox.pop(index)

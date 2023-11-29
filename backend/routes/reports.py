@@ -1,4 +1,6 @@
-"""Report URL routes. Collection of controller methods to create and
+"""Routes for reports.
+
+Report URL routes. Collection of controller methods to create and
 operate existing reports on the database.
 """
 from flask_smorest import Blueprint, abort
@@ -27,7 +29,7 @@ result_claim_url = result_claims_url + '/<uuid:report_id>'
 @queries.add_sorting(models.Submit)
 @queries.add_datefilter(models.Submit)
 def list_submits(*args, **kwargs):
-    """(Admins) Filters and list  submits
+    """(Admins) Filter and list submits.
 
     Use this method to get a list of submits filtered according to your
     requirements. The response returns a pagination object with the
@@ -37,7 +39,7 @@ def list_submits(*args, **kwargs):
 
 
 def __list_submits(query_args):
-    """ Returns a list of submit reports.
+    """Return a list of submit reports.
 
     :param query_args: The request query arguments as python dictionary
     :type query_args: dict
@@ -60,7 +62,7 @@ def __list_submits(query_args):
 @queries.add_sorting(models.Claim)
 @queries.add_datefilter(models.Claim)
 def list_claims(*args, **kwargs):
-    """(Admins) Filters and lists claims
+    """(Admins) Filter and lists claims.
 
     Use this method to get a list of claims filtered according to your
     requirements. The response returns a pagination object with the
@@ -70,7 +72,7 @@ def list_claims(*args, **kwargs):
 
 
 def __list_claims(query_args):
-    """Returns a list of claims reports.
+    """Return a list of claims reports.
 
     :param query_args: The request query arguments as python dictionary
     :type query_args: dict
@@ -89,7 +91,7 @@ def __list_claims(query_args):
 @flaat.access_level("admin")
 @blp.response(200, schemas.Claim)
 def get(*args, **kwargs):
-    """(Public) Retrieves claim details
+    """(Public) Retrieve claim details.
 
     Use this method to retrieve a specific claim from the database.
     """
@@ -97,7 +99,7 @@ def get(*args, **kwargs):
 
 
 def __get(report_id):
-    """Returns the id matching claim.
+    """Return the id matching claim.
 
     If no result exists with the indicated id, then 404 NotFound
     exception is raised.
@@ -122,7 +124,7 @@ def __get(report_id):
 @blp.arguments(args.Schema(), location='query', as_kwargs=True)
 @blp.response(204)
 def approve_claim(*args, **kwargs):
-    """(Admin) Accepts an existing claim
+    """(Admin) Accept an existing claim.
 
     Use this method to approve an specific resource submitted by an user.
     It is a custom method, as side effect, it removes the submit report
@@ -132,7 +134,7 @@ def approve_claim(*args, **kwargs):
 
 
 def __approve_claim(report_id):
-    """Accepts the id matching claim.
+    """Accept the id matching claim.
 
     If no submit exists with the indicated id, then 404 NotFound
     exception is raised.
@@ -170,7 +172,7 @@ def __approve_claim(report_id):
 @blp.arguments(args.Schema(), location='query', as_kwargs=True)
 @blp.response(204)
 def reject_claim(*args, **kwargs):
-    """(Admin) Refuses an existing claim
+    """(Admin) Refuse an existing claim.
 
     Use this method to reject an specific resource submitted by an user.
     It is a custom method, as side effect, it removes the resource and

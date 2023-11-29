@@ -1,4 +1,4 @@
-"""Benchmark module"""
+"""Benchmark module."""
 import jsonschema
 from flask_smorest import abort
 from jsonschema.exceptions import SchemaError
@@ -12,7 +12,9 @@ from .user import HasUploader
 
 
 class Benchmark(NeedsApprove, HasUploader, PkModel):
-    """The benchmark model represents a single type of docker container
+    """Benchmark model.
+
+    The benchmark model represents a single type of docker container
     designed to run and produce benchmark results from virtual machines.
 
     Benchmarks are tied down to a specific docker image and version to avoid
@@ -27,6 +29,7 @@ class Benchmark(NeedsApprove, HasUploader, PkModel):
 
     **Properties**:
     """
+
     #: (Text, required) Docker image referenced by the benchmark
     docker_image = Column(Text, nullable=False)
 
@@ -61,7 +64,7 @@ class Benchmark(NeedsApprove, HasUploader, PkModel):
         super().__init__(**properties)
 
     def __repr__(self) -> str:
-        """Human-readable representation string"""
+        """Human-readable representation string."""
         return "<{} {}:{}>".format(
             self.__class__.__name__,
             self.docker_image,

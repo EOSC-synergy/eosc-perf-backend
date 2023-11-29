@@ -8,6 +8,7 @@ str_booleans = [
 
 
 def new_filter(model, filter):
+    """Create new filter from a string."""
     path, operator, value = tuple(filter.split(' '))
     path = tuple(path.split('.'))
 

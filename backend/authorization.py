@@ -1,3 +1,4 @@
+"""Authorization rules for the backend."""
 from flaat.config import AccessLevel
 from flaat.requirements import IsTrue
 from flask import current_app

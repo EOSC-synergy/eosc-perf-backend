@@ -1,7 +1,8 @@
 """Defines fixtures available to benchmarks tests."""
-from backend import models
 from flask import url_for
 from pytest import fixture
+
+from backend import models
 
 
 @fixture(scope='function')
@@ -12,7 +13,7 @@ def benchmark_id(request):
 
 @fixture(scope='function')
 def benchmark(benchmark_id):
-    """Returns the benchmark to test."""
+    """Return the benchmark to test."""
     return models.Benchmark.query.get(benchmark_id)
 
 

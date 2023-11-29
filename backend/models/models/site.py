@@ -13,6 +13,7 @@ class Site(NeedsApprove, HasUploader, PkModel):
     This generally refers to the different virtual machine providers and
     should include a human readable name and physical location.
     """
+
     #: (Text, required) Human readable institution identification
     name = Column(Text, unique=True, nullable=False)
 
@@ -34,9 +35,9 @@ class Site(NeedsApprove, HasUploader, PkModel):
     )
 
     def __init__(self, **properties):
-        """Model initialization"""
+        """Model initialization."""
         super().__init__(**properties)
 
     def __repr__(self) -> str:
-        """Human-readable representation string"""
+        """Human-readable representation string."""
         return "<{} {}>".format(self.__class__.__name__, self.name)

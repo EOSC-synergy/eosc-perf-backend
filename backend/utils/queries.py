@@ -5,7 +5,7 @@ import flask_smorest
 
 
 def to_pagination():
-    """Decorator to convert the result query into a pagination object.
+    """Convert the result query into a pagination object.
 
     :return: Decorated function
     :rtype: fun
@@ -13,7 +13,7 @@ def to_pagination():
     def decorator_add_sorting(func):
         @functools.wraps(func)
         def decorator(*args, **kwargs):
-            """Converts the query into a pagination object."""
+            """Convert the query into a pagination object."""
             query_args = args[0]
             per_page = query_args.pop("per_page")
             page = query_args.pop("page")
@@ -24,7 +24,7 @@ def to_pagination():
 
 
 def add_sorting(model):
-    """Decorator to add sorting functionality to a controller method.
+    """Add sorting functionality to a controller method.
 
     :param model: Model with containing the sorting field
     :type model: :class:`backend.model.core.BaseModel`
@@ -34,7 +34,8 @@ def add_sorting(model):
     def decorator_add_sorting(func):
         @functools.wraps(func)
         def decorator(*args, **kwargs):
-            """Returns a sorting sql object from a model and a field control.
+            """Return a sorting sql object from a model and a field control.
+
             The field must be preceded with a control character:
             - '+' return an ascending sort object
             - '-' return a descending sort object
@@ -51,6 +52,7 @@ def add_sorting(model):
 
 
 def parse_sort(model, control_field):
+    """Sort a model by a control field."""
     if hasattr(model, "json") and control_field[1:6] == "json.":
         field = json_field(model, control_field)
     else:
@@ -71,11 +73,13 @@ def parse_sort(model, control_field):
 
 
 def json_field(model, control_field):
+    """Return control field from json field."""
     path = control_field[6:]
     return path_iter(model.json, path.split("."))
 
 
 def path_iter(fields, path):
+    """Return the field from a path."""
     if path == []:
         return fields
     else:
@@ -83,6 +87,7 @@ def path_iter(fields, path):
 
 
 def generic_field(model, control_field):
+    """Return control field from model."""
     try:
         return model.__dict__[control_field[1:]]
     except KeyError as err:
@@ -96,7 +101,7 @@ def generic_field(model, control_field):
 
 
 def add_datefilter(model):
-    """Decorator to add date filter to the request.
+    """Add date filter to the request.
 
     :return: Decorated function
     :rtype: fun
@@ -104,7 +109,7 @@ def add_datefilter(model):
     def decorator_add_datefilter(func):
         @functools.wraps(func)
         def decorator(*args, **kwargs):
-            """Extends the returned function query with time filters."""
+            """Extend the returned function query with time filters."""
             query_args = args[0]
             before = query_args.pop("upload_before", None)
             after = query_args.pop("upload_after", None)

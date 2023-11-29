@@ -1,7 +1,8 @@
 """Functional tests using pytest-flask."""
-from backend import models
 from flask import url_for
 from pytest import fixture, mark
+
+from backend import models
 from tests import asserts
 from tests.db_instances import users
 
@@ -14,6 +15,7 @@ def url(endpoint, request_id, query):
 
 @mark.parametrize("endpoint", ["reports.list_submits"], indirect=True)
 class TestListSubmits:
+    """Test reports list submits endpoint."""
 
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
@@ -27,7 +29,7 @@ class TestListSubmits:
         {},  # Multiple reports
         {"sort_by": "+upload_datetime"},
     ])
-    def test_200(self, response_GET, url):
+    def test_200(self, response_GET, url):  # noqa N803
         """GET method succeeded 200."""
         assert response_GET.status_code == 200
         asserts.match_pagination(response_GET.json, url)
@@ -41,7 +43,7 @@ class TestListSubmits:
     @mark.parametrize("query", indirect=True, argvalues=[
         {"upload_before": "3000-01-01"},
     ])
-    def test_401(self, response_GET):
+    def test_401(self, response_GET):  # noqa N803
         """GET method fails 401 if not logged in."""
         assert response_GET.status_code == 401
 
@@ -50,7 +52,7 @@ class TestListSubmits:
     @mark.parametrize("query", indirect=True, argvalues=[
         {"upload_before": "3000-01-01"},
     ])
-    def test_403(self, response_GET):
+    def test_403(self, response_GET):  # noqa N803
         """GET method fails 403 if forbidden."""
         assert response_GET.status_code == 403
 
@@ -61,13 +63,14 @@ class TestListSubmits:
         {"bad_key": "This is a non expected query key"},
         {"sort_by": "Bad sort command"},
     ])
-    def test_422(self, response_GET):
+    def test_422(self, response_GET):  # noqa N803
         """GET method fails 422 if bad request body."""
         assert response_GET.status_code == 422
 
 
 @mark.parametrize("endpoint", ["reports.list_claims"], indirect=True)
 class TestListClaims:
+    """Test reports list claims endpoint."""
 
     @mark.usefixtures("grant_admin")
     @mark.parametrize("token_sub", [users[0]["sub"]], indirect=True)
@@ -79,7 +82,7 @@ class TestListClaims:
         {"sort_by": "+upload_datetime"},
     ]
     )
-    def test_200(self, response_GET, url):
+    def test_200(self, response_GET, url):  # noqa N803
         """GET method succeeded 200."""
         assert response_GET.status_code == 200
         asserts.match_pagination(response_GET.json, url)
@@ -96,7 +99,7 @@ class TestListClaims:
     @mark.parametrize("query", indirect=True, argvalues=[
         {"upload_before": "3000-01-01"},
     ])
-    def test_401(self, response_GET):
+    def test_401(self, response_GET):  # noqa N803
         """GET method fails 401 if not logged in."""
         assert response_GET.status_code == 401
 
@@ -105,7 +108,7 @@ class TestListClaims:
     @mark.parametrize("query", indirect=True, argvalues=[
         {"upload_before": "3000-01-01"},
     ])
-    def test_403(self, response_GET):
+    def test_403(self, response_GET):  # noqa N803
         """GET method fails 403 if forbidden."""
         assert response_GET.status_code == 403
 
@@ -116,6 +119,6 @@ class TestListClaims:
         {"bad_key": "This is a non expected query key"},
         {"sort_by": "Bad sort command"},
     ])
-    def test_422(self, response_GET):
+    def test_422(self, response_GET):  # noqa N803
         """GET method fails 422 if bad request body."""
         assert response_GET.status_code == 422

@@ -1,4 +1,6 @@
-"""Flavor URL routes. Collection of controller methods to
+"""Routes for flavors.
+
+Flavor URL routes. Collection of controller methods to
 operate existing flavors on the database.
 """
 from flask_smorest import Blueprint, abort
@@ -20,7 +22,7 @@ resource_url = "/<uuid:flavor_id>"
 @blp.doc(operationId='GetFlavor')
 @blp.response(200, schemas.Flavor)
 def get(*args, **kwargs):
-    """(Public) Retrieves flavor details
+    """(Public) Retrieve flavor details.
 
     Use this method to retrieve a specific flavor from the database.
     """
@@ -28,7 +30,7 @@ def get(*args, **kwargs):
 
 
 def __get(flavor_id):
-    """Returns the id matching flavor.
+    """Return the id matching flavor.
 
     If no flavor exists with the indicated id, then 404 NotFound
     exception is raised.
@@ -53,7 +55,7 @@ def __get(flavor_id):
 @blp.arguments(schemas.Flavor)
 @blp.response(204)
 def update(*args, **kwargs):
-    """(Admins) Updates an existing flavor
+    """(Admins) Update an existing flavor.
 
     Use this method to update a specific flavor from the database.
     """
@@ -61,7 +63,7 @@ def update(*args, **kwargs):
 
 
 def __update(body_args, flavor_id):
-    """Updates a flavor specific fields.
+    """Update a flavor specific fields.
 
     If no flavor exists with the indicated id, then 404 NotFound
     exception is raised.
@@ -94,7 +96,7 @@ def __update(body_args, flavor_id):
 @flaat.access_level("admin")
 @blp.response(204)
 def delete(*args, **kwargs):
-    """(Admins) Deletes an existing flavor
+    """(Admins) Delete an existing flavor.
 
     Use this method to delete a specific flavor from the database.
     """
@@ -102,7 +104,7 @@ def delete(*args, **kwargs):
 
 
 def __delete(flavor_id):
-    """Deletes the id matching flavor.
+    """Delete the id matching flavor.
 
     If no flavor exists with the indicated id, then 404 NotFound
     exception is raised.
@@ -132,7 +134,7 @@ def __delete(flavor_id):
 @flaat.access_level("admin")
 @blp.response(204)
 def approve(*args, **kwargs):
-    """(Admins) Approves a flavor to include it on default list methods
+    """(Admins) Approve a flavor to include it on default list methods.
 
     Use this method to approve an specific flavor submitted by an user.
     It is a custom method, as side effect, it removes the submit report
@@ -215,7 +217,7 @@ def __reject(flavor_id):
 @blp.response(200, schemas.Site)
 @blp.doc(operationId='GetFlavorSite')
 def site(*args, **kwargs):
-    """(Public) Retrieves flavor site details
+    """(Public) Retrieve flavor site details.
 
     Use this method to retrieve the site information from a
     specific flavor in the database.
@@ -224,7 +226,7 @@ def site(*args, **kwargs):
 
 
 def __site(flavor_id):
-    """Returns the flavor site.
+    """Return the flavor site.
 
     If no flavor exists with the indicated id, then 404 NotFound
     exception is raised.

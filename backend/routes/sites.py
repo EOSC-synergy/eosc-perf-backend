@@ -1,4 +1,6 @@
-"""Site URL routes. Collection of controller methods to create and
+"""Routes for sites.
+
+Site URL routes. Collection of controller methods to create and
 operate existing sites on the database.
 """
 from flask_smorest import Blueprint, abort
@@ -26,7 +28,7 @@ resource_url = "/<uuid:site_id>"
 @queries.add_sorting(models.Site)
 @queries.add_datefilter(models.Site)
 def list(*args, **kwargs):
-    """(Public) Filters and list sites
+    """(Public) Filter and list sites.
 
     Use this method to get a list of sites filtered according to your
     requirements. The response returns a pagination object with the
@@ -36,7 +38,7 @@ def list(*args, **kwargs):
 
 
 def __list(query_args):
-    """Returns a list of filtered sites.
+    """Return a list of filtered sites.
 
     :param query_args: The request query arguments as python dictionary
     :type query_args: dict
@@ -55,7 +57,7 @@ def __list(query_args):
 @blp.arguments(schemas.CreateSite)
 @blp.response(201, schemas.Site)
 def create(*args, **kwargs):
-    """(Users) Uploads a new site
+    """(Users) Upload a new site.
 
     Use this method to create a new site in the database so it can
     be accessed by the application users. The method returns the complete
@@ -65,7 +67,7 @@ def create(*args, **kwargs):
 
 
 def __create(body_args, user_infos):
-    """Creates a new site in the database.
+    """Create a new site in the database.
 
     :param body_args: The request body arguments as python dictionary
     :type body_args: dict
@@ -98,7 +100,7 @@ def __create(body_args, user_infos):
 @queries.add_sorting(models.Site)
 @queries.add_datefilter(models.Site)
 def search(*args, **kwargs):
-    """(Public) Filters and list sites
+    """(Public) Filter and list sites.
 
     Use this method to get a list of sites based on a general search
     of terms. For example, calling this method with terms=K&terms=T
@@ -110,7 +112,7 @@ def search(*args, **kwargs):
 
 
 def __search(query_args):
-    """Filters and list sites.
+    """Filter and list sites.
 
     :param query_args: The request query arguments as python dictionary
     :type query_args: dict
@@ -133,7 +135,7 @@ def __search(query_args):
 @blp.doc(operationId='GetSite')
 @blp.response(200, schemas.Site)
 def get(*args, **kwargs):
-    """(Public) Retrieves site details
+    """(Public) Retrieve site details.
 
     Use this method to retrieve a specific site from the database.
     """
@@ -141,7 +143,7 @@ def get(*args, **kwargs):
 
 
 def __get(site_id):
-    """Returns the id matching site.
+    """Return the id matching site.
 
     If no site exists with the indicated id, then 404 NotFound
     exception is raised.
@@ -166,7 +168,7 @@ def __get(site_id):
 @blp.arguments(schemas.Site)
 @blp.response(204)
 def update(*args, **kwargs):
-    """(Admins) Updates an existing site
+    """(Admins) Update an existing site.
 
     Use this method to update a specific site from the database.
     """
@@ -174,7 +176,7 @@ def update(*args, **kwargs):
 
 
 def __update(body_args, site_id):
-    """Updates a site specific fields.
+    """Update a site specific fields.
 
     If no site exists with the indicated id, then 404 NotFound
     exception is raised.
@@ -203,7 +205,7 @@ def __update(body_args, site_id):
 @blp.doc(operationId='DeleteSite')
 @blp.response(204)
 def delete(*args, **kwargs):
-    """(Admins) Deletes an existing site
+    """(Admins) Delete an existing site.
 
     Use this method to delete a specific site from the database.
     """
@@ -211,7 +213,7 @@ def delete(*args, **kwargs):
 
 
 def __delete(site_id):
-    """Deletes the id matching site.
+    """Delete the id matching site.
 
     If no site exists with the indicated id, then 404 NotFound
     exception is raised.
@@ -237,7 +239,7 @@ def __delete(site_id):
 @blp.doc(operationId='ApproveSite')
 @blp.response(204)
 def approve(*args, **kwargs):
-    """(Admins) Approves a site to include it on default list methods
+    """(Admins) Approve a site to include it on default list methods.
 
     Use this method to approve an specific site submitted by an user.
     It is a custom method, as side effect, it removes the submit report
@@ -324,7 +326,7 @@ def __reject(site_id):
 @queries.add_sorting(models.Flavor)
 @queries.add_datefilter(models.Flavor)
 def list_flavors(*args, **kwargs):
-    """(Public) Filters and list flavors
+    """(Public) Filter and list flavors.
 
     Use this method to get a list of flavors filtered according to your
     requirements. The response returns a pagination object with the
@@ -334,7 +336,7 @@ def list_flavors(*args, **kwargs):
 
 
 def __list_flavors(query_args, site_id):
-    """ Lists the site flavors.
+    """List the site flavors.
 
     :param query_args: The request query arguments as python dictionary
     :type query_args: dict
@@ -356,7 +358,7 @@ def __list_flavors(query_args, site_id):
 @blp.arguments(schemas.CreateFlavor)
 @blp.response(201, schemas.Flavor)
 def create_flavor(*args, **kwargs):
-    """(Users) Uploads a new flavor
+    """(Users) Upload a new flavor.
 
     Use this method to create a new flavors in the database so it can
     be accessed by the application users. The method returns the complete
@@ -366,7 +368,7 @@ def create_flavor(*args, **kwargs):
 
 
 def __create_flavor(body_args, site_id, user_infos):
-    """Creates a flavor linked to a site id.
+    """Create a flavor linked to a site id.
 
     :param body_args: The request body arguments as python dictionary
     :type body_args: dict
@@ -404,7 +406,7 @@ def __create_flavor(body_args, site_id, user_infos):
 @queries.add_sorting(models.Flavor)
 @queries.add_datefilter(models.Flavor)
 def search_flavors(*args, **kwargs):
-    """(Public) Filters and list flavors
+    """(Public) Filter and list flavors.
 
     Use this method to get a list of flavors based on a general search
     of terms. For example, calling this method with terms=K&terms=T

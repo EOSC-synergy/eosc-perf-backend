@@ -1,4 +1,6 @@
-"""This module implements the loading of multiple flask extensions to
+"""Extensions module.
+
+This module implements the loading of multiple flask extensions to
 extend the basic provided functionality to the API requirements.
 For more information about flask and extensions see:
 

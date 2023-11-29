@@ -1,4 +1,6 @@
-"""Tag URL routes. Collection of controller methods to create and
+"""Routes for the /tags and /tags/<uuid:tag_id> endpoints.
+
+Tag URL routes. Collection of controller methods to create and
 operate existing user tags on the database.
 """
 from flask_smorest import Blueprint, abort
@@ -25,7 +27,7 @@ resource_url = "/<uuid:tag_id>"
 @queries.to_pagination()
 @queries.add_sorting(models.Tag)
 def list(*args, **kwargs):
-    """(Public) Filters and list tags
+    """(Public) Filter and list tags.
 
     Use this method to get a list of tags filtered according to your
     requirements. The response returns a pagination object with the
@@ -35,7 +37,7 @@ def list(*args, **kwargs):
 
 
 def __list(query_args):
-    """Returns a list of filtered tags.
+    """Return a list of filtered tags.
 
     :param query_args: The request query arguments as python dictionary
     :type query_args: dict
@@ -53,7 +55,7 @@ def __list(query_args):
 @blp.arguments(schemas.CreateTag)
 @blp.response(201, schemas.Tag)
 def create(*args, **kwargs):
-    """(Users) Uploads a new tag
+    """(Users) Upload a new tag.
 
     Use this method to create a new tags in the database so it can
     be accessed by the application users. The method returns the complete
@@ -63,7 +65,7 @@ def create(*args, **kwargs):
 
 
 def __create(body_args):
-    """Creates a new tag in the database.
+    """Create a new tag in the database.
 
     :param body_args: The request body arguments as python dictionary
     :type body_args: dict
@@ -92,7 +94,7 @@ def __create(body_args):
 @queries.to_pagination()
 @queries.add_sorting(models.Tag)
 def search(*args, **kwargs):
-    """(Public) Filters and list tags
+    """(Public) Filter and list tags.
 
     Use this method to get a list of tags based on a general search
     of terms. For example, calling this method with terms=v1&terms=0
@@ -104,7 +106,7 @@ def search(*args, **kwargs):
 
 
 def __search(query_args):
-    """Filters and list tags using generic terms.
+    """Filter and list tags using generic terms.
 
     :param query_args: The request query arguments as python dictionary
     :type query_args: dict
@@ -126,7 +128,7 @@ def __search(query_args):
 @blp.doc(operationId='GetTag')
 @blp.response(200, schemas.Tag)
 def get(*args, **kwargs):
-    """(Public) Retrieves tag details
+    """(Public) Retrieve tag details.
 
     Use this method to retrieve a specific tag from the database.
     """
@@ -134,7 +136,7 @@ def get(*args, **kwargs):
 
 
 def __get(tag_id):
-    """Returns the id matching tag.
+    """Return the id matching tag.
 
     If no tag exists with the indicated id, then 404 NotFound
     exception is raised.
@@ -159,7 +161,7 @@ def __get(tag_id):
 @blp.arguments(schemas.Tag)
 @blp.response(204)
 def update(*args, **kwargs):
-    """(Admins) Updates an existing tag
+    """(Admins) Update an existing tag.
 
     Use this method to update a specific tag from the database.
     """
@@ -167,7 +169,7 @@ def update(*args, **kwargs):
 
 
 def __update(body_args, tag_id):
-    """Updates a benchmark specific fields.
+    """Update a benchmark specific fields.
 
     If no tag exists with the indicated id, then 404 NotFound
     exception is raised.
@@ -196,7 +198,7 @@ def __update(body_args, tag_id):
 @flaat.access_level("admin")
 @blp.response(204)
 def delete(*args, **kwargs):
-    """(Admins) Deletes an existing tag
+    """(Admins) Delete an existing tag.
 
     Use this method to delete a specific tag from the database.
     """
@@ -204,7 +206,7 @@ def delete(*args, **kwargs):
 
 
 def __delete(tag_id):
-    """Deletes the id matching tag.
+    """Delete the id matching tag.
 
     If no tag exists with the indicated id, then 404 NotFound
     exception is raised.

@@ -6,11 +6,12 @@ from flask_mailman import EmailMessage
 
 
 def warning_if_fail(notification):
+    """Wrap a notification function to catch exceptions and log them."""
     @wraps(notification)
     def decorated(*args, **kwargs):
         try:
             return notification(*args, **kwargs)
-        except Exception as err:
+        except Exception as err:  # noqa: B902
             current_app.logger.warning(f"{err}")
             return err
 
@@ -32,6 +33,7 @@ perf-support
 
 @warning_if_fail
 def user_welcome(user):
+    """Email user after registration."""
     return EmailMessage(
         subject="Thank you for registering",
         body=user_welcome_body,
@@ -55,6 +57,7 @@ perf-support
 
 @warning_if_fail
 def email_updated(user):
+    """Send an email notification to the user when information is updated."""
     return EmailMessage(
         subject="Your user information was updated",
         body=email_update_body,
@@ -81,6 +84,7 @@ perf-support
 
 @warning_if_fail
 def resource_submitted(resource):
+    """Email user a resource is submitted."""
     resource_type = resource.submit_report.resource_type
     return EmailMessage(
         subject=f"New {resource_type} resource submitted: {resource.id}",
@@ -109,6 +113,7 @@ perf-support
 
 @warning_if_fail
 def resource_approved(resource):
+    """Email user a resource is approved."""
     return EmailMessage(
         subject=f"Resource approved: {resource.id}",
         body=resource_approved_body.format(resource=resource),
@@ -138,6 +143,7 @@ perf-support
 
 @warning_if_fail
 def resource_rejected(uploader, resource):
+    """Email user a resource is rejected."""
     return EmailMessage(
         subject=f"Resource rejected: {resource.id}",
         body=resource_rejected_body.format(resource=resource),
@@ -169,6 +175,7 @@ perf-support
 
 @warning_if_fail
 def result_claimed(result, claim):
+    """Email user a result is claimed."""
     return EmailMessage(
         subject=f"Claim submitted on result: {result.id}",
         body=result_claimed_body.format(result=result, claim=claim),
@@ -197,6 +204,7 @@ perf-support
 
 @warning_if_fail
 def result_restored(result):
+    """Email user a result is restored."""
     return EmailMessage(
         subject=f"Result restored: {result.id}",
         body=result_restored_body.format(result=result),

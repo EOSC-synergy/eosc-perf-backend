@@ -1,4 +1,4 @@
-"""Module with db db_instances specifications for factories"""
+"""Module with db db_instances specifications for factories."""
 from datetime import datetime
 from uuid import uuid4
 

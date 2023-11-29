@@ -1,4 +1,6 @@
-"""This is the main web application package for the EOSC Performance
+"""Backend package.
+
+This is the main web application package for the EOSC Performance
 Application Program Interface (API).
 
 The application is developed using python and flask as main engines.
@@ -6,16 +8,16 @@ By default, Flask does not provide database or specific web abstraction
 layers. API and any other functionality such database or authentication
 are handled by independent libraries and extension.
 """
-from .app import create_app
 import flask.blueprints
+
+from .app import create_app
 
 __all__ = ["create_app"]
 
 
 class MyBlueprintSetupState(flask.blueprints.BlueprintSetupState):
     def add_url_rule(self, rule, endpoint=None, view_func=None, **options):
-        """Monkey patch to allow ':' in route for custom methods.
-        """
+        """Monkey patch to allow ':' in route for custom methods."""
         if self.url_prefix is not None:
             if rule:
                 rule = self.url_prefix + rule

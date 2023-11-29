@@ -1,7 +1,7 @@
-"""Factories package to with classes to create easily new instances
-in the backend database. This package is based into the library`factory boy`
-and the subpackage `models` for more information visit the following
-links:
+"""Factories package with classes to create easily instances in the db.
+
+This package is based into the library`factory boy` and the subpackage
+ `models` for more information visit the following links:
 
 - Factory boy: https://factoryboy.readthedocs.io/en/stable/
 - Models: :doc:`/_backend/models`

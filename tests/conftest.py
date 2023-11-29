@@ -1,16 +1,17 @@
 """Defines fixtures available to all tests.
+
 See: https://pytest-flask.readthedocs.io/en/latest/features.html
 """
 import logging
 import os
 
-import backend.utils.imagerepo as imagerepo
-import factories
-from backend import create_app, extensions
 from flaat.user_infos import UserInfos
 from pytest import fixture
 from pytest_postgresql.janitor import DatabaseJanitor
 
+import backend.utils.imagerepo as imagerepo
+import factories
+from backend import create_app, extensions
 from tests import db_instances
 
 TEST_DB = 'test_database'
@@ -20,10 +21,10 @@ VERSION = 12.2  # postgresql version number
 @fixture(scope='session')
 def sql_database(postgresql_proc):
     """Create a temp Postgres database for the tests."""
-    USER = postgresql_proc.user
-    HOST = postgresql_proc.host
-    PORT = postgresql_proc.port
-    PASS = "not-so-secret-for-testing"
+    USER = postgresql_proc.user  # noqa: N806
+    HOST = postgresql_proc.host  # noqa: N806
+    PORT = postgresql_proc.port  # noqa: N806
+    PASS = "not-so-secret-for-testing"  # noqa: N806
     with DatabaseJanitor(USER, HOST, PORT, TEST_DB, VERSION, PASS) as db:
         yield db
 
@@ -74,7 +75,7 @@ def db(app):
 
 @fixture(scope='function', autouse=True)
 def session(db):
-    """Uploads a new database session for a test."""
+    """Upload a new database session for a test."""
     db.session.begin(nested=True)  # Rollback app commits
     yield db.session
     db.session.rollback()   # Discard test changes
@@ -83,13 +84,13 @@ def session(db):
 
 @fixture(scope='function')
 def token_sub(request):
-    """Returns the sub to include on the user token."""
+    """Return the sub to include on the user token."""
     return request.param if hasattr(request, 'param') else None
 
 
 @fixture(scope='function')
 def token_iss(request):
-    """Returns the iss to include on the user token."""
+    """Return the iss to include on the user token."""
     return request.param if hasattr(request, 'param') else None
 
 
@@ -101,13 +102,13 @@ def access_token(token_sub, token_iss):
 
 @fixture(scope='function')
 def user_email(request):
-    """Returns the email to be returned by the introspection endpoint."""
+    """Return the email to be returned by the introspection endpoint."""
     return request.param if hasattr(request, 'param') else None
 
 
 @fixture(scope='function', autouse=True)
 def user_infos(mocker, token_sub, token_iss, user_email):
-    """Patches flaat to edit provided user_infos."""
+    """Patch flaat to edit provided user_infos."""
     mocker.patch.object(
         extensions.flaat, "get_user_infos_from_access_token",
         return_value=UserInfos(
@@ -162,30 +163,30 @@ def body(request):
 
 
 @fixture(scope='function')
-def response_GET(client, url, headers):
+def response_GET(client, url, headers):  # noqa: N802
     """Fixture that return the result of a GET request."""
     return client.get(url, headers=headers)
 
 
 @fixture(scope='function')
-def response_POST(client, url, headers, body):
+def response_POST(client, url, headers, body):  # noqa: N802
     """Fixture that return the result of a POST request."""
     return client.post(url, headers=headers, json=body)
 
 
 @fixture(scope='function')
-def response_PUT(client, url, headers, body):
+def response_PUT(client, url, headers, body):  # noqa: N802
     """Fixture that return the result of a PUT request."""
     return client.put(url, headers=headers, json=body)
 
 
 @fixture(scope='function')
-def response_PATCH(client, url, headers, body):
+def response_PATCH(client, url, headers, body):  # noqa: N802
     """Fixture that return the result of a PATCH request."""
     return client.patch(url, headers=headers, json=body)
 
 
 @fixture(scope='function')
-def response_DELETE(client, url, headers):
+def response_DELETE(client, url, headers):  # noqa: N802
     """Fixture that return the result of a DELETE request."""
     return client.delete(url, headers=headers)

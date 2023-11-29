@@ -1,12 +1,11 @@
-"""${message}
+"""${message}.
 
 Revision ID: ${up_revision}
 Revises: ${down_revision | comma,n}
 Create Date: ${create_date}
-
 """
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 ${imports if imports else ""}
 
 # revision identifiers, used by Alembic.
@@ -17,8 +16,10 @@ depends_on = ${repr(depends_on)}
 
 
 def upgrade():
+    """Upgrade database."""
     ${upgrades if upgrades else "pass"}
 
 
 def downgrade():
+    """Downgrade database."""
     ${downgrades if downgrades else "pass"}

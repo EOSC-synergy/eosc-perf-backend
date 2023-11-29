@@ -1,7 +1,8 @@
 """Defines fixtures available to sites tests."""
-from backend import models
 from flask import url_for
 from pytest import fixture
+
+from backend import models
 
 
 @fixture(scope='function')
@@ -12,7 +13,7 @@ def site_id(request):
 
 @fixture(scope='function')
 def site(site_id):
-    """Returns the site to test."""
+    """Return the site to test."""
     return models.Site.query.get(site_id)
 
 

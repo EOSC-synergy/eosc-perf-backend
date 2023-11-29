@@ -9,7 +9,9 @@ from .user import HasUploader
 
 
 class Flavor(NeedsApprove, HasUploader, PkModel):
-    """The Flavor model represents a flavor of virtual machines available
+    """Flavor model.
+
+    The Flavor model represents a flavor of virtual machines available
     for usage on a Site.
 
     Flavours can be pre-existing options filled in by administrators or a
@@ -17,6 +19,7 @@ class Flavor(NeedsApprove, HasUploader, PkModel):
 
     **Properties**:
     """
+
     #: (Text, required) Text with virtual hardware template identification
     name = Column(Text, nullable=False)
 
@@ -36,9 +39,9 @@ class Flavor(NeedsApprove, HasUploader, PkModel):
     )
 
     def __init__(self, **properties):
-        """Model initialization"""
+        """Model initialization."""
         super().__init__(**properties)
 
     def __repr__(self) -> str:
-        """Human-readable representation string"""
+        """Human-readable representation string."""
         return "<{} {}>".format(self.__class__.__name__, self.name)

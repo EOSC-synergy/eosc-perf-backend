@@ -9,9 +9,11 @@ from ..core import TokenModel
 
 
 class User(TokenModel):
-    """The User model represents the users of the application. Users are
-    build over a OIDC token model, therefore are identified based on the
-    'Subject' and 'issuer' identifications provided by the OIDC provider.
+    """The User model represents the users of the application.
+
+    Users are build over a OIDC token model, therefore are identified based
+    on the 'Subject' and 'issuer' identifications provided by the OIDC
+    provider.
 
     Also an email is collected which is expected to match the one provided
     by the ODIC introspection endpoint.
@@ -31,16 +33,17 @@ class User(TokenModel):
     registration_datetime = Column(DateTime, nullable=False, default=dt.now())
 
     def __init__(self, **properties):
-        """Model initialization"""
+        """Model initialization."""
         super().__init__(**properties)
 
     def __repr__(self) -> str:
-        """Human-readable representation string"""
+        """Human-readable representation string."""
         return "<{} {}>".format(self.__class__.__name__, self.email)
 
 
 class HasUploader(object):
     """Mixin that adds an User as upload details to any model."""
+
     __abstract__ = True
 
     #: (Text) OIDC subject of the user that created the model instance,
@@ -55,8 +58,8 @@ class HasUploader(object):
     upload_datetime = Column(DateTime, nullable=False, default=dt.now)
 
     @declared_attr
-    def uploader(cls):
-        """(User class) User that uploaded the model instance"""
+    def uploader(self):
+        """(User class) User that uploaded the model instance."""
         return relationship("User", backref=backref(
-            f'_{cls.__name__.lower()}s', cascade="all, delete-orphan"
+            f'_{self.__name__.lower()}s', cascade="all, delete-orphan"
         ))

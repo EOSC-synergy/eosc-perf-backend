@@ -1,6 +1,4 @@
 """Module to define query arguments."""
-from uuid import uuid4
-
 from marshmallow import fields
 from marshmallow.validate import OneOf, Range
 
@@ -9,6 +7,7 @@ from . import Search, Status, UploadFilter
 
 
 class Pagination(Schema):
+    """Pagination arguments."""
 
     #: (Int, required, dump_only):
     #: The number of items to be displayed on a page.
@@ -26,6 +25,7 @@ class Pagination(Schema):
 
 
 class UserFilter(Pagination, Schema):
+    """User filter arguments."""
 
     #: (Text, required, dump_only):
     #: Primary key containing the OIDC subject the model instance
@@ -62,15 +62,18 @@ class UserFilter(Pagination, Schema):
 
 
 class UserDelete(UserFilter):
-    class Meta:
+    """User delete arguments."""
+
+    class Meta:  # noqa: D106
         fields = ("sub", "iss", "email")
 
 
 class UserSearch(Pagination, Search, Schema):
-    pass
+    """User search arguments."""
 
 
 class SubmitFilter(Pagination, UploadFilter, Schema):
+    """Submit filter arguments."""
 
     #: (String):
     #: Resource discriminator
@@ -93,6 +96,7 @@ class SubmitFilter(Pagination, UploadFilter, Schema):
 
 
 class ClaimFilter(Pagination, UploadFilter, Status, Schema):
+    """Claim filter arguments."""
 
     #: (Str):
     #: Order to return the results separated by coma
@@ -107,6 +111,7 @@ class ClaimFilter(Pagination, UploadFilter, Status, Schema):
 
 
 class TagFilter(Pagination, Schema):
+    """Tag filter arguments."""
 
     #: (Text):
     #: Human readable feature identification
@@ -128,10 +133,11 @@ class TagFilter(Pagination, Schema):
 
 
 class TagSearch(Pagination, Search, Schema):
-    pass
+    """Tag search arguments."""
 
 
 class BenchmarkFilter(Pagination, UploadFilter, Status, Schema):
+    """Benchmark filter arguments."""
 
     #: (Text, required):
     #: Docker image referenced by the benchmark
@@ -160,10 +166,11 @@ class BenchmarkFilter(Pagination, UploadFilter, Status, Schema):
 
 
 class BenchmarkSearch(Pagination, UploadFilter, Status, Search, Schema):
-    pass
+    """Benchmark search arguments."""
 
 
 class SiteFilter(Pagination, UploadFilter, Status, Schema):
+    """Site filter arguments."""
 
     #: (Text):
     #: Human readable institution identification
@@ -192,10 +199,11 @@ class SiteFilter(Pagination, UploadFilter, Status, Schema):
 
 
 class SiteSearch(Pagination, UploadFilter, Status, Search, Schema):
-    pass
+    """Site search arguments."""
 
 
 class FlavorFilter(Pagination, UploadFilter, Status, Schema):
+    """Flavor filter argumetns."""
 
     #: (Text):
     #: Text with virtual hardware template identification
@@ -217,10 +225,11 @@ class FlavorFilter(Pagination, UploadFilter, Status, Schema):
 
 
 class FlavorSearch(Pagination, UploadFilter, Status, Search, Schema):
-    pass
+    """Flavor search arguments."""
 
 
 class ResultFilter(Pagination, UploadFilter, Schema):
+    """Result filter arguments."""
 
     #: (ISO8601):
     #: Execution datetime of the instance before a specific date
@@ -299,6 +308,7 @@ class ResultFilter(Pagination, UploadFilter, Schema):
 
 
 class ResultContext(Schema):
+    """Result context arguments."""
 
     #: (ISO8601, required) :
     #: Benchmark execution **START**
@@ -338,4 +348,4 @@ class ResultContext(Schema):
 
 
 class ResultSearch(Pagination, UploadFilter, Search, Schema):
-    pass
+    """Result search arguments."""

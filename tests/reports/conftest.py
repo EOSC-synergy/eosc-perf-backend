@@ -1,13 +1,14 @@
 """Defines fixtures available to reports tests."""
 from flask import url_for
 from pytest import fixture
-from factories import DBResult
+
 from backend.extensions import db
+from factories import DBResult
 
 
 @fixture(scope='function')
 def result():
-    """Result id of the result to test."""
+    """Return result id of the result to test."""
     result = DBResult(claims=["Result claim"])
     db.session.commit()
     return result
@@ -15,7 +16,7 @@ def result():
 
 @fixture(scope='function')
 def claim(result):
-    """Returns the result to test."""
+    """Return the result to test."""
     return result.claims[0]
 
 

@@ -1,18 +1,19 @@
 """Defines fixtures available to tags tests."""
-from backend import models
 from flask import url_for
 from pytest import fixture
+
+from backend import models
 
 
 @fixture(scope='function')
 def tag_id(request):
-    """Tag id of the tag to test."""
+    """Return tag id of the tag to test."""
     return request.param if hasattr(request, 'param') else None
 
 
 @fixture(scope='function')
 def tag(tag_id):
-    """Returns the tag to test."""
+    """Return the tag to test."""
     return models.Tag.query.get(tag_id)
 
 
@@ -24,5 +25,5 @@ def request_id(request, tag_id):
 
 @fixture(scope='function')
 def url(endpoint, request_id, query):
-    """Fixture that return the url for the request."""
+    """Return the url for the request."""
     return url_for(endpoint, id=request_id, **query)

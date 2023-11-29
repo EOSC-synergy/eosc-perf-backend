@@ -1,6 +1,4 @@
 """Schemas module for schemas definition."""
-import uuid
-
 from marshmallow import INCLUDE, post_dump
 from marshmallow.validate import OneOf
 
@@ -10,8 +8,8 @@ from . import Id, Pagination, UploadDatetime, fields
 
 # ---------------------------------------------------------------------
 # Definition of User schemas
-
 class User(Schema):
+    """User schema definition."""
 
     #: (Text, required, dump_only):
     #: Primary key containing the OIDC subject the model instance
@@ -44,6 +42,7 @@ class User(Schema):
 
 
 class Users(Pagination, Schema):
+    """Users pagination schema definition."""
 
     #: ([User], required):
     #: List of site items for the pagination object
@@ -54,6 +53,7 @@ class Users(Pagination, Schema):
 # Definition of Report schemas
 
 class Submit(UploadDatetime, Schema):
+    """Submit schema definition."""
 
     #: (String, required):
     #: Resource discriminator
@@ -80,6 +80,7 @@ class Submit(UploadDatetime, Schema):
 
     @post_dump
     def aggregate_claims(self, data, **kwargs):
+        """Aggregate claims to the submit report."""
         data = super().remove_skip_values(data, **kwargs)
         if 'resource_type' in data:
             if "claim" in data['resource_type']:
@@ -88,6 +89,7 @@ class Submit(UploadDatetime, Schema):
 
 
 class Submits(Pagination, Schema):
+    """Submits pagination schema definition."""
 
     #: ([Submit], required):
     #: List of submit items for the pagination object
@@ -95,6 +97,7 @@ class Submits(Pagination, Schema):
 
 
 class CreateClaim(Schema):
+    """Claim creation schema definition."""
 
     #: (String, required):
     #: Claim text describing the resource issue
@@ -105,6 +108,7 @@ class CreateClaim(Schema):
 
 
 class Claim(Id, UploadDatetime, CreateClaim):
+    """Claim schema definition."""
 
     #: (UUID, required):
     #: Resource unique identification
@@ -128,6 +132,7 @@ class Claim(Id, UploadDatetime, CreateClaim):
 
 
 class Claims(Pagination, Schema):
+    """Claims pagination schema definition."""
 
     #: ([Claim], required):
     #: List of claim items for the pagination object
@@ -138,6 +143,7 @@ class Claims(Pagination, Schema):
 # Definition of Tag schemas
 
 class CreateTag(Schema):
+    """Tag creation schema definition."""
 
     #: (Text, required):
     #: Human readable feature identification
@@ -155,10 +161,11 @@ class CreateTag(Schema):
 
 
 class Tag(Id, CreateTag):
-    pass
+    """Tag schema definition."""
 
 
 class Tags(Pagination, Schema):
+    """Tags pagination schema definition."""
 
     #: ([Tag], required):
     #: List of tag items for the pagination object
@@ -166,6 +173,7 @@ class Tags(Pagination, Schema):
 
 
 class TagsIds(Schema):
+    """Tags Ids schema definition."""
 
     #: ([UUID]):
     #: List of tag ids
@@ -176,6 +184,7 @@ class TagsIds(Schema):
 # Definition of benchmark schemas
 
 class CreateBenchmark(Schema):
+    """Benchmark creation schema definition."""
 
     #: (Text, required):
     #: Docker image referenced by the benchmark
@@ -192,7 +201,7 @@ class CreateBenchmark(Schema):
     )
 
     #: (Text, required):
-    #: URL to the benchmark container documentation 
+    #: URL to the benchmark container documentation
     url = fields.String(
         description="String with a docker hub container tag",
         example="https://hub.docker.com/r/deephdc/deep-oc-benchmarks_cnn",
@@ -248,10 +257,11 @@ class CreateBenchmark(Schema):
 
 
 class Benchmark(Id, UploadDatetime, CreateBenchmark):
-    pass
+    """Benchmark schema definition."""
 
 
 class Benchmarks(Pagination, Schema):
+    """Benchmarks pagination schema definition."""
 
     #: ([Benchmark], required):
     #: List of benchmark items for the pagination object
@@ -262,6 +272,7 @@ class Benchmarks(Pagination, Schema):
 # Definition of Site schemas
 
 class CreateSite(Schema):
+    """Create site schema definition."""
 
     #: (Text, required):
     #: Human readable institution identification
@@ -286,10 +297,11 @@ class CreateSite(Schema):
 
 
 class Site(Id, UploadDatetime, CreateSite):
-    pass
+    """Site schema definition."""
 
 
 class Sites(Pagination, Schema):
+    """Sites pagination schema definition."""
 
     #: ([Site], required):
     #: List of site items for the pagination object
@@ -300,6 +312,7 @@ class Sites(Pagination, Schema):
 # Definition of Flavor schemas
 
 class CreateFlavor(Schema):
+    """Create flavor schema definition."""
 
     #: (Text, required):
     #: Text with virtual hardware template identification
@@ -317,10 +330,11 @@ class CreateFlavor(Schema):
 
 
 class Flavor(Id, UploadDatetime, CreateFlavor):
-    pass
+    """Flavor schema definition."""
 
 
 class Flavors(Pagination, Schema):
+    """Flavors pagination schema definition."""
 
     #: ([Flavor], required):
     #: List of flavor items for the pagination object
@@ -331,6 +345,7 @@ class Flavors(Pagination, Schema):
 # Definition of Result schemas
 
 class Result(Id, UploadDatetime, Schema):
+    """Result schema definition."""
 
     #: (ISO8601, required) :
     #: Benchmark execution **START**
@@ -361,6 +376,7 @@ class Result(Id, UploadDatetime, Schema):
 
 
 class Results(Pagination, Schema):
+    """Results pagination schema definition."""""
 
     #: ([Result], required):
     #: List of results items for the pagination object
@@ -368,8 +384,8 @@ class Results(Pagination, Schema):
 
 
 class Json(Schema):
-    """Special schema to allow free JSON property"""
-    class Meta:
-        """`marshmallow` options object for JSON properties"""
+    """Special schema to allow free JSON property."""
+
+    class Meta:  # noqa: D106
         #: Accept and include the unknown fields
         unknown = INCLUDE

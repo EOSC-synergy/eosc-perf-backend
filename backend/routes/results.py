@@ -1,4 +1,6 @@
-"""Results URL routes. Collection of controller methods to create and
+"""Routes for results.
+
+Results URL routes. Collection of controller methods to create and
 operate existing benchmark results on the database.
 """
 import datetime as dt
@@ -29,7 +31,7 @@ resource_url = "/<uuid:result_id>"
 @queries.add_sorting(models.Result)
 @queries.add_datefilter(models.Result)
 def list(*args, **kwargs):
-    """(Public) Filters and list results
+    """(Public) Filter and list results.
 
     Use this method to get a list of results filtered according to your
     requirements. The response returns a pagination object with the
@@ -61,7 +63,7 @@ def list(*args, **kwargs):
 
 
 def __list(query_args):
-    """Returns a list of filtered results.
+    """Return a list of filtered results.
 
     Note the URL-encoding is only needed when accessing the function as
     HTTP request. The python call handles the filters only as strings.
@@ -105,10 +107,7 @@ def __list(query_args):
                 'hint': "Use only one of ['==', '>', '<', '>=', '<=']",
                 'example': "filters=machine.cpu.count%20%3E%205"
             })
-    try:
-        query = query.filter(and_(True, *parsed_filters))
-    except Exception as err:
-        abort(422, message={'filter': err.args})
+    query = query.filter(and_(True, *parsed_filters))
 
     # Model filter with remaining standard parameters
     return query.filter_by(**query_args)
@@ -122,7 +121,7 @@ def __list(query_args):
 @blp.arguments(schemas.Json)
 @blp.response(201, schemas.Result)
 def create(*args, **kwargs):
-    """(Users) Uploads a new result
+    """(Users) Upload a new result.
 
     Use this method to create a new result in the database so it can
     be accessed by the application users. The method returns the complete
@@ -138,7 +137,7 @@ def create(*args, **kwargs):
 
 
 def __create(query_args, body_args, user_infos):
-    """Creates a new result in the database.
+    """Create a new result in the database.
 
     :param query_args: The request query arguments as python dictionary
     :type query_args: dic
@@ -195,7 +194,7 @@ def __create(query_args, body_args, user_infos):
 @queries.add_sorting(models.Result)
 @queries.add_datefilter(models.Result)
 def search(*args, **kwargs):
-    """(Public) Filters and list results
+    """(Public) Filter and list results.
 
     Use this method to get a list of results based on a general search
     of terms. For example, calling this method with terms=v1&terms=0
@@ -208,7 +207,7 @@ def search(*args, **kwargs):
 
 
 def __search(query_args):
-    """Filters and list results using generic terms.
+    """Filter and list results using generic terms.
 
     :param query_args: The request query arguments as python dictionary
     :type query_args: dict
@@ -235,7 +234,7 @@ def __search(query_args):
 @blp.doc(operationId='GetResult')
 @blp.response(200, schemas.Result)
 def get(*args, **kwargs):
-    """(Public) Retrieves result details
+    """(Public) Retrieve result details.
 
     Use this method to retrieve a specific result from the database.
     """
@@ -243,7 +242,7 @@ def get(*args, **kwargs):
 
 
 def __get(result_id):
-    """Returns the id matching result.
+    """Return the id matching result.
 
     If no result exists with the indicated id, then 404 NotFound
     exception is raised.
@@ -267,7 +266,7 @@ def __get(result_id):
 @flaat.access_level("admin")
 @blp.response(204)
 def delete(*args, **kwargs):
-    """(Admin) Deletes an existing result
+    """(Admin) Delete an existing result.
 
     Use this method to delete a specific result from the database.
     """
@@ -275,7 +274,7 @@ def delete(*args, **kwargs):
 
 
 def __delete(result_id):
-    """Deletes the id matching result.
+    """Delete the id matching result.
 
     If no result exists with the indicated id, then 404 NotFound
     exception is raised.
@@ -303,7 +302,7 @@ def __delete(result_id):
 @blp.arguments(schemas.CreateClaim)
 @blp.response(201, schemas.Claim)
 def claim(*args, **kwargs):
-    """(Users) Reports a result
+    """(Users) Report a result.
 
     Use this method to create a report for a specific result so the
     administrators are aware of issues. The reported result is hidden
@@ -314,7 +313,7 @@ def claim(*args, **kwargs):
 
 
 def __claim(body_args, result_id, user_infos):
-    """Creates a claim linked to the report
+    """Create a claim linked to the report.
 
     If no result exists with the indicated id, then 404 NotFound
     exception is raised.
@@ -349,7 +348,7 @@ def __claim(body_args, result_id, user_infos):
 @blp.arguments(schemas.TagsIds)
 @blp.response(204)
 def update_tags(*args, **kwargs):
-    """(Owner or Admin) Updates an existing result tags
+    """(Owner or Admin) Update an existing result tags.
 
     Use this method to update tags on a specific result from the database.
     """
@@ -357,7 +356,7 @@ def update_tags(*args, **kwargs):
 
 
 def __update_tags(body_args, result_id, user_infos):
-    """Updates a result specific fields.
+    """Update a result specific fields.
 
     If no result exists with the indicated id, then 404 NotFound
     exception is raised.
@@ -410,7 +409,7 @@ def list_claims(*args, **kwargs):
 
 
 def __list_claims(query_args, result_id, user_infos):
-    """Returns the result claims filtered by the query args.
+    """Return the result claims filtered by the query args.
 
     :param query_args: The request query arguments as python dictionary
     :type query_args: dict
@@ -438,7 +437,7 @@ def __list_claims(query_args, result_id, user_infos):
 @flaat.access_level("admin")
 @blp.response(200, schemas.User)
 def get_uploader(*args, **kwargs):
-    """(Admins) Retrieves result uploader
+    """(Admins) Retrieve result uploader.
 
     Use this method to retrieve the uploader of a specific result
     from the database.
@@ -447,7 +446,7 @@ def get_uploader(*args, **kwargs):
 
 
 def __get_uploader(result_id):
-    """Returns the uploader of the id matching result.
+    """Return the uploader of the id matching result.
 
     If no result exists with the indicated id, then 404 NotFound
     exception is raised.

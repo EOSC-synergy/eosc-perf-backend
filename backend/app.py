@@ -1,6 +1,4 @@
-"""Application module where to define the flask application and
-extensions to build the backend package.
-"""
+"""Application module to define flask application."""
 import logging
 import sys
 
@@ -9,11 +7,11 @@ from flask import Flask
 from webargs.flaskparser import FlaskParser
 
 from . import routes
-from .extensions import api         # Api interface module
-from .extensions import flaat       # Flask authentication with tokens
-from .extensions import db          # SQLAlchemy instance
-from .extensions import migrate     # Alembic ext. manage db migrations
-from .extensions import mail        # Mail ext. to send notifications
+from .extensions import api  # Api interface module
+from .extensions import db  # SQLAlchemy instance
+from .extensions import flaat  # Flask authentication with tokens
+from .extensions import mail  # Mail ext. to send notifications
+from .extensions import migrate  # Alembic ext. manage db migrations
 
 #: Raise ValidationError when unknown fields in query
 FlaskParser.DEFAULT_UNKNOWN_BY_LOCATION["query"] = ma.RAISE
@@ -22,7 +20,9 @@ FlaskParser.DEFAULT_UNKNOWN_BY_LOCATION["query"] = ma.RAISE
 # Sourced from:
 # https://web.archive.org/web/20131129080707/http://flask.pocoo.org/snippets/35
 class ReverseProxied(object):
-    """Wrap the application in this middleware and configure the
+    """Reverse Proxied class.
+
+    Wrap the application in this middleware and configure the
     front-end server to add these headers, to let you quietly bind
     this to a URL other than / and to an HTTP scheme that is
     different than what is used locally.
@@ -44,9 +44,11 @@ class ReverseProxied(object):
     """
 
     def __init__(self, app):
+        """Construct the app."""
         self.app = app
 
     def __call__(self, environ, start_response):
+        """Call the app."""
         script_name = environ.get('HTTP_X_SCRIPT_NAME', '')
         if script_name:
             environ['SCRIPT_NAME'] = script_name
@@ -61,7 +63,9 @@ class ReverseProxied(object):
 
 
 def create_app(config_base="backend.settings", **settings_override):
-    """Create application factory, as explained here:
+    """Create application factory.
+
+    As explained here:
     http://flask.pocoo.org/docs/patterns/appfactories
 
     :param config_base: Configuration object, defaults to "backend.settings"

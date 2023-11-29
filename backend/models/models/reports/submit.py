@@ -1,4 +1,6 @@
-"""Reports module with mixin that provides a generic association
+"""Report module for the Submit model.
+
+Reports module with mixin that provides a generic association
 using a single target table and a single association table,
 referred to by all parent tables.  The association table
 contains a "discriminator" column which determines what type of
@@ -11,23 +13,26 @@ different association types.
 import enum
 from datetime import datetime as dt
 
-from backend.models.models.user import HasUploader
 from sqlalchemy import Column, DateTime, Enum, ForeignKey, String
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import backref, relationship
+
+from backend.models.models.user import HasUploader
 
 from ...core import PkModel
 
 
 class Submit(PkModel):
     """The Submit model represents an automated request for review.
+
     For example the creation of items which need to be approved before
     activated in the database or the notification that a new claim is
     created.
 
     **Properties**:
     """
+
     #: (Resource) Resource the submit is linked to
     resource = NotImplementedError()  # Implemented at NeedsApprove
 
@@ -48,11 +53,11 @@ class Submit(PkModel):
     }
 
     def __init__(self, **properties):
-        """Model initialization"""
+        """Model initialization."""
         super().__init__(**properties)
 
     def __repr__(self):
-        """Human-readable representation string"""
+        """Human-readable representation string."""
         return "{}({}): {}".format(
             self.__class__.__name__,
             self.resource_type,
@@ -61,60 +66,61 @@ class Submit(PkModel):
 
 
 class ResourceStatus(enum.Enum):
+    """Enum with the possible status of a resource."""
+
     on_review = 1
     approved = 2
 
 
 class NeedsApprove(HasUploader):
-    """Creates a new submit report together with the new resource.
-    """
+    """Creates a new submit report together with the new resource."""
+
     __abstract__ = True
 
     #: (ItemStatus) Status of the resource
     status = Column(Enum(ResourceStatus), default=ResourceStatus.on_review)
 
     def __init__(self, *args, **kwargs):
+        """Initialize the model."""
         super().__init__(*args, **kwargs)
         self.__class__._submit_report_class(resource=self)
 
     @declared_attr
-    def _submit_report_id(cls):
+    def _submit_report_id(self):
         return Column(ForeignKey('submit.id'))
 
     @declared_attr
-    def _submit_report_class(cls):
+    def _submit_report_class(self):
         return type(
-            f"{cls.__name__}SubmitReport", (Submit,),
+            f"{self.__name__}SubmitReport", (Submit,),
             dict(
                 __mapper_args__={
-                    'polymorphic_identity': cls.__name__.lower(),
+                    'polymorphic_identity': self.__name__.lower(),
                     'polymorphic_load': 'inline'
                 },
             ),
         )
 
     @declared_attr
-    def submit_report(cls):
-        """(Report) Submit report related to the model instance"""
+    def submit_report(self):
+        """(Report) Submit report related to the model instance."""
         return relationship(
-            cls._submit_report_class, cascade="all, delete",
+            self._submit_report_class, cascade="all, delete",
             backref=backref("resource", uselist=False),
         )
 
     def approve(self):
-        """Removes the submit report once approved."""
+        """Remove the submit report once approved."""
         if self.status == ResourceStatus.approved:
             raise RuntimeError("Resource already approved")
-        else:
-            self.submit_report.delete()
-            self.submit_report = None
-            self.status = ResourceStatus.approved
+        self.submit_report.delete()
+        self.submit_report = None
+        self.status = ResourceStatus.approved
 
     def reject(self):
-        """Removes the element and submit report."""
+        """Remove the element and submit report."""
         if self.status == ResourceStatus.approved:
             raise RuntimeError("Resource already approved")
-        else:
-            # self.submit_report.delete() # Cascades
-            # self.submit_report = None
-            self.delete()
+        # self.submit_report.delete() # Cascades
+        # self.submit_report = None
+        self.delete()

@@ -1,18 +1,20 @@
-"""Factories module to define the main model factories"""
+"""Factories module to define the main model factories."""
 import uuid
 
-from backend import models
 from factory import LazyFunction, Sequence, SubFactory, post_generation
 from factory.alchemy import SQLAlchemyModelFactory
+
+from backend import models
 
 from .core import BaseMeta, fdt
 
 
 class DBUser(SQLAlchemyModelFactory):
-    """User factory. Default kwargs are:"""
-    class Meta(BaseMeta):
+    """User factory. Default kwargs are:"""  # noqa: D400
+
+    class Meta(BaseMeta):  # noqa: D106
         model = models.User
-        sqlalchemy_get_or_create = ('email',)
+        sqlalchemy_get_or_create = ("email",)
 
     sub = Sequence(lambda n: f"user{n}")
     iss = "https://aai-dev.egi.eu/oidc"
@@ -20,10 +22,11 @@ class DBUser(SQLAlchemyModelFactory):
 
 
 class DBBenchmark(SQLAlchemyModelFactory):
-    """Benchmark factory. Default kwargs are:"""
-    class Meta(BaseMeta):
+    """Benchmark factory. Default kwargs are:"""  # noqa: D400
+
+    class Meta(BaseMeta):  # noqa: D106
         model = models.Benchmark
-        sqlalchemy_get_or_create = ('id',)
+        sqlalchemy_get_or_create = ("id",)
 
     id = LazyFunction(uuid.uuid4)
     upload_datetime = fdt.fuzz()
@@ -36,6 +39,7 @@ class DBBenchmark(SQLAlchemyModelFactory):
 
     @post_generation
     def status(self, create, status, **kwargs):
+        """Status post generation."""
         if not status or status == "on_review":
             pass
         elif status == "approved":
@@ -45,10 +49,11 @@ class DBBenchmark(SQLAlchemyModelFactory):
 
 
 class DBSite(SQLAlchemyModelFactory):
-    """Site factory. Default kwargs are:"""
-    class Meta(BaseMeta):
+    """Site factory. Default kwargs are:"""  # noqa: D400
+
+    class Meta(BaseMeta):  # noqa: D106
         model = models.Site
-        sqlalchemy_get_or_create = ('id',)
+        sqlalchemy_get_or_create = ("id",)
 
     id = LazyFunction(uuid.uuid4)
     upload_datetime = fdt.fuzz()
@@ -60,6 +65,7 @@ class DBSite(SQLAlchemyModelFactory):
 
     @post_generation
     def status(self, create, status, **kwargs):
+        """Status post generation."""
         if not status or status == "on_review":
             pass
         elif status == "approved":
@@ -69,10 +75,11 @@ class DBSite(SQLAlchemyModelFactory):
 
 
 class DBFlavor(SQLAlchemyModelFactory):
-    """Flavor factory. Default kwargs are:"""
-    class Meta(BaseMeta):
+    """Flavor factory. Default kwargs are:"""  # noqa: D400
+
+    class Meta(BaseMeta):  # noqa: D106
         model = models.Flavor
-        sqlalchemy_get_or_create = ('id',)
+        sqlalchemy_get_or_create = ("id",)
 
     id = LazyFunction(uuid.uuid4)
     upload_datetime = fdt.fuzz()
@@ -84,6 +91,7 @@ class DBFlavor(SQLAlchemyModelFactory):
 
     @post_generation
     def status(self, create, status, **kwargs):
+        """Status post generation."""
         if not status or status == "on_review":
             pass
         elif status == "approved":
@@ -93,10 +101,11 @@ class DBFlavor(SQLAlchemyModelFactory):
 
 
 class DBTag(SQLAlchemyModelFactory):
-    """Tag factory. Default kwargs are:"""
-    class Meta(BaseMeta):
+    """Tag factory. Default kwargs are:"""  # noqa: D400
+
+    class Meta(BaseMeta):  # noqa: D106
         model = models.Tag
-        sqlalchemy_get_or_create = ('id',)
+        sqlalchemy_get_or_create = ("id",)
 
     id = LazyFunction(uuid.uuid4)
     name = Sequence(lambda n: f"tag{n}")
@@ -104,15 +113,16 @@ class DBTag(SQLAlchemyModelFactory):
 
 
 class DBResult(SQLAlchemyModelFactory):
-    """Result factory. Default kwargs are:"""
-    class Meta(BaseMeta):
+    """Result factory. Default kwargs are:"""  # noqa: D400
+
+    class Meta(BaseMeta):  # noqa: D106
         model = models.Result
-        sqlalchemy_get_or_create = ('id',)
+        sqlalchemy_get_or_create = ("id",)
 
     id = LazyFunction(uuid.uuid4)
     upload_datetime = fdt.fuzz()
     execution_datetime = fdt.fuzz()
-    json = Sequence(lambda n: {'name': f"result_{n}"})
+    json = Sequence(lambda n: {"name": f"result_{n}"})
     benchmark = SubFactory(DBBenchmark)
     flavor = SubFactory(DBFlavor)
     upload_datetime = fdt.fuzz()
@@ -120,6 +130,7 @@ class DBResult(SQLAlchemyModelFactory):
 
     @post_generation
     def tags(self, create, specs, **kwargs):
+        """Tags post generation."""
         specs = specs if specs is not None else []
         for spec in specs:
             tag = DBTag(**{**spec, **kwargs})
@@ -127,11 +138,10 @@ class DBResult(SQLAlchemyModelFactory):
 
     @post_generation
     def claims(self, create, messages, **kwargs):
+        """Claims post generation."""
         if messages:
             for msg in messages:
                 self._claim_report_class(
-                    uploader=DBUser(),
-                    message=msg,
-                    resource=self
+                    uploader=DBUser(), message=msg, resource=self
                 ).approve()
             self.delete

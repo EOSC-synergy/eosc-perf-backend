@@ -1,4 +1,6 @@
-"""This is the application configuration module. It is used to load
+"""Application settings.
+
+This is the application configuration module. It is used to load
 from the system environment and files the configuration to use
 when deploying an application instance.
 
@@ -11,7 +13,6 @@ import functools
 
 from environs import Env, EnvError
 from marshmallow.validate import OneOf
-
 
 env = Env()
 env.read_env()
@@ -38,7 +39,8 @@ By default it is set to `production`.
 
 # Overload of environs functions with dev_default
 def development_defaults(func):
-    """Decoration function to add "dev_default" input.
+    """Decorate function to add "dev_default" input.
+
     If ENV == 'development' and dev_default, default is replaced
     """
     @functools.wraps(func)
@@ -231,6 +233,6 @@ API_SPEC_OPTIONS['components'] = {
 API_SPEC_OPTIONS['info'] = {
     "license": {
         "name": "MIT",
-        "url": "https://raw.githubusercontent.com/EOSC-synergy/eosc-perf/master/LICENSE",
+        "url": "https://raw.githubusercontent.com/EOSC-synergy/eosc-perf/master/LICENSE", # noqa E501
     }
 }
