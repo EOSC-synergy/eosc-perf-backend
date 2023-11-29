@@ -1,41 +1,41 @@
 # Everything needed in production
 
 # Flask
-flask~=2.1.0
+flask < 3.0.0
 
 # Database
-flask-SQLAlchemy~=2.5.1
-SQLAlchemy~=1.4.1
-psycopg2-binary~=2.9.3
+flask-SQLAlchemy ~= 3.0.5
+SQLAlchemy < 2.0.0
+psycopg2-binary
 
 # Migrations
-flask-migrate~=3.0.0
+flask-migrate ~= 4.0.5
 
 # Schemas
-marshmallow~=3.13.0
-jsonschema~=3.2.0
+marshmallow ~= 3.20.1
+jsonschema ~= 4.20.0
 
 # REST GUI
-flask-smorest~=0.37.0
+flask-smorest ~= 0.42.2
 
 # Deployment in production
-gevent~=23.9.1
-gunicorn~=20.1.0
-supervisor~=4.2.2
+gevent ~= 23.9.1
+gunicorn ~= 21.2.0
+supervisor ~= 4.2.5
 
 # Auth
-flaat~=1.1.1
-requests~=2.27.1
+flaat ~= 1.1.14
+requests ~= 2.31.0
 
 # Notifications
-flask-mailman~=0.3.0
-blinker~=1.4.0
+flask-mailman ~= 1.0.0
+blinker ~= 1.7.0
 
 # Environment variable parsing
-environs~=9.3.5
+environs ~= 9.5.0
 
 # Time control
-pytz~=2022.1
+pytz ~= 2023.1
 
 # Containers
-udocker == 1.3.4
+udocker ~= 1.3.12

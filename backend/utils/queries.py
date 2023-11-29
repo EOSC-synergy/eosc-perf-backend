@@ -18,7 +18,7 @@ def to_pagination():
             per_page = query_args.pop("per_page")
             page = query_args.pop("page")
             query = func(*args, **kwargs)
-            return query.paginate(page, per_page)
+            return query.paginate(page=page, per_page=per_page)
         return decorator
     return decorator_add_sorting
 

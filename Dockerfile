@@ -1,5 +1,5 @@
 # ================================== BUILDER ===================================
-ARG INSTALL_PYTHON_VERSION=3.8
+ARG INSTALL_PYTHON_VERSION=3.10
 ARG PYTHON_IMAGE_TAG=slim-buster
 FROM python:${INSTALL_PYTHON_VERSION}-${PYTHON_IMAGE_TAG} AS backend
 
