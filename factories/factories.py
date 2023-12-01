@@ -1,12 +1,17 @@
 """Factories module to define the main model factories."""
 import uuid
+from datetime import datetime
 
 from factory import LazyFunction, Sequence, SubFactory, post_generation
 from factory.alchemy import SQLAlchemyModelFactory
+from factory.fuzzy import FuzzyDateTime
+from pytz import timezone
 
 from backend import models
 
-from .core import BaseMeta, fdt
+from .core import BaseMeta
+
+fdt = FuzzyDateTime(datetime(2008, 1, 1, tzinfo=timezone("Europe/Berlin")))
 
 
 class DBUser(SQLAlchemyModelFactory):
