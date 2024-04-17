@@ -20,7 +20,7 @@ flask-smorest ~= 0.42.2
 
 # Deployment in production
 gevent ~= 23.9.1
-gunicorn ~= 21.2.0
+gunicorn ~= 22.0.0
 supervisor ~= 4.2.5
 
 # Auth
